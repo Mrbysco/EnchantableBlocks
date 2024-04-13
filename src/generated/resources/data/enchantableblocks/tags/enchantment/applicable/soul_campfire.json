@@ -1,0 +1,13 @@
+{
+  "values": [
+    "enchantableblocks:boiling",
+    "enchantableblocks:concealed",
+    "enchantableblocks:glintless",
+    "minecraft:vanishing_curse",
+    "minecraft:blast_protection",
+    {
+      "id": "stickerframes:foiled",
+      "required": false
+    }
+  ]
+}

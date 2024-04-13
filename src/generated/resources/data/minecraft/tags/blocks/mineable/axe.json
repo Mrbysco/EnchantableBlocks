@@ -1,0 +1,10 @@
+{
+  "values": [
+    "enchantableblocks:enchanted_crafting_table",
+    "enchantableblocks:enchanted_beehive",
+    "enchantableblocks:enchanted_chest",
+    "enchantableblocks:enchanted_trapped_chest",
+    "enchantableblocks:enchanted_campfire",
+    "enchantableblocks:enchanted_soul_campfire"
+  ]
+}

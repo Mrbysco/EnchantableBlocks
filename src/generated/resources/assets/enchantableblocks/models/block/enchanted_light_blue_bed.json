@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/bed",
+  "render_type": "minecraft:cutout"
+}

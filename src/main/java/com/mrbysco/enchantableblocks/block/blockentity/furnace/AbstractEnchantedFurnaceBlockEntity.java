@@ -1,0 +1,327 @@
+package com.mrbysco.enchantableblocks.block.blockentity.furnace;
+
+import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
+import com.mrbysco.enchantableblocks.mixin.AbstractFurnaceBlockEntityAccessor;
+import com.mrbysco.enchantableblocks.registry.ModEnchantments;
+import com.mrbysco.enchantableblocks.util.TagHelper;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.AbstractCookingRecipe;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.AbstractFurnaceBlock;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
+
+import javax.annotation.Nullable;
+import java.util.Map;
+
+public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnaceBlockEntity implements IEnchantable {
+	protected ListTag enchantmentTag = null;
+	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
+
+	protected AbstractEnchantedFurnaceBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state,
+	                                              RecipeType<? extends AbstractCookingRecipe> recipeType) {
+		super(blockEntityType, pos, state, recipeType);
+	}
+
+	public static void serverTick(Level level, BlockPos pos, BlockState state, AbstractEnchantedFurnaceBlockEntity blockEntity) {
+		AbstractFurnaceBlockEntityAccessor blockEntityAccessor = (AbstractFurnaceBlockEntityAccessor) blockEntity;
+		final RecipeManager.CachedCheck<Container, ? extends AbstractCookingRecipe> quickCheck = blockEntityAccessor.getQuickCheck();
+		boolean isLit = blockEntity.isLit();
+		boolean changed = false;
+		boolean flag2 = !blockEntity.items.get(0).isEmpty();
+
+		if (blockEntity.isLit()) {
+			int speed = blockEntity.getSpeed();
+			if (blockEntity.hasEnchantment(ModEnchantments.SOLAR_RADIANCE.get())) {
+				if (level.isDay() && level.canSeeSky(pos)) {
+					blockEntity.litTime = 20;
+				} else {
+					blockEntity.litTime -= speed;
+				}
+			} else {
+				boolean preservation = blockEntity.hasEnchantment(ModEnchantments.PRESERVATION.get());
+				if (preservation) {
+					Recipe<?> recipe = flag2 ? quickCheck.getRecipeFor(blockEntity, level).orElse(null) : null;
+					if (recipe != null)
+						blockEntity.litTime -= speed;
+
+				} else {
+					blockEntity.litTime -= speed;
+				}
+			}
+		}
+
+		ItemStack fuel = blockEntity.items.get(1);
+		boolean flag3 = !fuel.isEmpty();
+		if (blockEntity.isLit() || flag3 && flag2) {
+			Recipe<?> recipe = flag2 ? quickCheck.getRecipeFor(blockEntity, level).orElse(null) : null;
+			int i = blockEntity.getMaxStackSize();
+			if (!blockEntity.isLit() && blockEntityAccessor.invokeCanBurn(level.registryAccess(), recipe, blockEntity.items, i)) {
+				blockEntity.litTime = blockEntity.getBurnDuration(fuel);
+				blockEntity.litDuration = blockEntity.litTime;
+				if (blockEntity.isLit()) {
+					changed = true;
+					if (fuel.hasCraftingRemainingItem())
+						blockEntity.items.set(1, fuel.getCraftingRemainingItem());
+					else if (flag3) {
+						fuel.shrink(1);
+						if (fuel.isEmpty()) {
+							blockEntity.items.set(1, fuel.getCraftingRemainingItem());
+						}
+					}
+				}
+			}
+
+			if (blockEntity.isLit() && blockEntityAccessor.invokeCanBurn(level.registryAccess(), recipe, blockEntity.items, i)) {
+				int speed = blockEntity.getSpeed();
+				blockEntity.cookingProgress += speed;
+				if (blockEntity.cookingProgress >= blockEntity.cookingTotalTime) {
+					blockEntity.cookingProgress = 0;
+					blockEntity.cookingTotalTime = getTotalCookTime(level, blockEntity);
+					if (blockEntity.enchantedBurn(level.registryAccess(), recipe, blockEntity.items, i)) {
+						blockEntity.setRecipeUsed(recipe);
+					}
+
+					changed = true;
+				}
+			} else {
+				blockEntity.cookingProgress = 0;
+			}
+		} else if (!blockEntity.isLit() && blockEntity.cookingProgress > 0) {
+			blockEntity.cookingProgress = Mth.clamp(blockEntity.cookingProgress - 2, 0, blockEntity.cookingTotalTime);
+		}
+
+		if (isLit != blockEntity.isLit()) {
+			changed = true;
+			state = state.setValue(AbstractFurnaceBlock.LIT, blockEntity.isLit());
+			level.setBlock(pos, state, 3);
+		}
+
+		if (changed) {
+			setChanged(level, pos, state);
+		}
+	}
+
+	private int getSpeed() {
+		int speed = 1;
+		if (hasEnchantment(ModEnchantments.SPEED.get())) {
+			int enchantmentLevel = getEnchantmentLevel(ModEnchantments.SPEED.get());
+			//Adjust the speed based on the level of the enchantment
+			speed = speed * (1 + enchantmentLevel / (2 + Math.abs(enchantmentLevel)));
+		}
+		return speed;
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean enchantedBurn(RegistryAccess pRegistryAccess, @Nullable Recipe<?> pRecipe, NonNullList<ItemStack> inventory, int pMaxStackSize) {
+		if (pRecipe != null && ((AbstractFurnaceBlockEntityAccessor) this).invokeCanBurn(pRegistryAccess, pRecipe, inventory, pMaxStackSize)) {
+			ItemStack inputStack = inventory.get(0);
+			ItemStack craftedStack = ((Recipe<WorldlyContainer>) pRecipe).assemble(this, pRegistryAccess);
+			if (hasEnchantment(ModEnchantments.YIELD.get())) {
+				int enchantmentLevel = getEnchantmentLevel(ModEnchantments.YIELD.get());
+				//Adjust the craftedStack based on the level of the enchantment
+				int count = (enchantmentLevel + 1) / 2 + 1 / (enchantmentLevel + 2);
+				craftedStack.setCount(count);
+			}
+
+			ItemStack resultStack = inventory.get(2);
+			if (hasEnchantment(ModEnchantments.EXPORTING.get()) && this.getBlockState() != null) {
+				Direction direction = this.getBlockState().getValue(AbstractFurnaceBlock.FACING);
+				BlockPos leftPos = this.getBlockPos().relative(direction.getClockWise());
+				BlockPos rightPos = this.getBlockPos().relative(direction.getCounterClockWise());
+				if (this.level.isLoaded(leftPos)) {
+					BlockEntity blockEntity = this.level.getBlockEntity(leftPos);
+					if (blockEntity != null) {
+						IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getCounterClockWise()).orElse(null);
+						if (itemHandler != null) {
+							resultStack = ItemHandlerHelper.insertItem(itemHandler, craftedStack, false);
+						}
+					}
+				}
+				if (this.level.isLoaded(rightPos)) {
+					BlockEntity blockEntity = this.level.getBlockEntity(rightPos);
+					if (blockEntity != null) {
+						IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getClockWise()).orElse(null);
+						if (itemHandler != null) {
+							resultStack = ItemHandlerHelper.insertItem(itemHandler, craftedStack, false);
+						}
+					}
+				}
+			}
+
+			if (resultStack.isEmpty()) {
+				inventory.set(2, craftedStack.copy());
+			} else if (resultStack.is(craftedStack.getItem())) {
+				resultStack.grow(craftedStack.getCount());
+			}
+
+			if (inputStack.is(Blocks.WET_SPONGE.asItem()) && !inventory.get(1).isEmpty() && inventory.get(1).is(Items.BUCKET)) {
+				inventory.set(1, new ItemStack(Items.WATER_BUCKET));
+			}
+
+			inputStack.shrink(1);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private static int getTotalCookTime(Level level, AbstractEnchantedFurnaceBlockEntity blockEntity) {
+		AbstractFurnaceBlockEntityAccessor blockEntityAccessor = (AbstractFurnaceBlockEntityAccessor) blockEntity;
+		int cookTime = blockEntityAccessor.getQuickCheck().getRecipeFor(blockEntity, level).map(AbstractCookingRecipe::getCookingTime).orElse(200);
+		if (blockEntity.hasEnchantment(ModEnchantments.SPEED.get())) {
+			int enchantmentLevel = blockEntity.getEnchantmentLevel(ModEnchantments.SPEED.get());
+			//Adjust the cookTime based on the level of the enchantment
+		}
+		return cookTime;
+	}
+
+	@Override
+	protected int getBurnDuration(ItemStack fuel) {
+		int burnDuration = super.getBurnDuration(fuel);
+		if (burnDuration != 0 && this.hasEnchantment(ModEnchantments.FUEL_EFFICIENCY.get())) {
+			int enchantmentLevel = this.getEnchantmentLevel(ModEnchantments.FUEL_EFFICIENCY.get());
+			//Adjust the burnDuration based on the level of the enchantment
+			burnDuration = burnDuration * (1 + enchantmentLevel / (3 + Math.abs(enchantmentLevel)));
+		}
+		return burnDuration;
+	}
+
+	private boolean isLit() {
+		return this.litTime > 0;
+	}
+
+	@Override
+	public Map<Enchantment, Integer> getEnchantments() {
+		return enchantments;
+	}
+
+	@Override
+	public boolean hasEnchantment(Enchantment enchantment) {
+		return this.enchantments.containsKey(enchantment);
+	}
+
+	@Override
+	public int getEnchantmentLevel(Enchantment enchantment) {
+		if (this.hasEnchantment(enchantment))
+			return this.enchantments.get(enchantment);
+		return -1;
+	}
+
+	@Override
+	public boolean hasEnchantment(TagKey<Enchantment> enchantmentTag) {
+		for (Enchantment enchantment : this.enchantments.keySet()) {
+			if (TagHelper.matchesTag(enchantment, enchantmentTag)) {
+				return true;
+			}
+		}
+		return this.enchantments.containsKey(enchantmentTag);
+	}
+
+	@Override
+	public int getEnchantmentLevel(TagKey<Enchantment> enchantmentTag) {
+		for (Enchantment enchantment : this.enchantments.keySet()) {
+			if (TagHelper.matchesTag(enchantment, enchantmentTag)) {
+				return this.enchantments.get(enchantment);
+			}
+		}
+		return -1;
+	}
+
+	@Override
+	public void setEnchantments(ListTag enchantmentTags) {
+		this.enchantmentTag = enchantmentTags;
+		this.updateEnchantmentMap();
+	}
+
+	@Override
+	public ListTag getEnchantmentsTag() {
+		return this.enchantmentTag;
+	}
+
+	@Override
+	public void updateEnchantmentMap() {
+		this.enchantments.clear();
+		if (this.enchantmentTag != null) {
+			EnchantmentHelper.deserializeEnchantments(this.enchantmentTag).forEach((enchantment, integer) -> {
+				if (enchantment != null) {
+					this.enchantments.put(enchantment, integer);
+				}
+			});
+		}
+	}
+
+	@Override
+	public void load(CompoundTag tag) {
+		super.load(tag);
+		if (tag.contains("Enchantments")) {
+			this.enchantmentTag = tag.getList("Enchantments", Tag.TAG_COMPOUND);
+			this.updateEnchantmentMap();
+		}
+	}
+
+	@Override
+	protected void saveAdditional(CompoundTag tag) {
+		super.saveAdditional(tag);
+		if (this.enchantmentTag != null)
+			tag.put("Enchantments", enchantmentTag);
+	}
+
+	//Sync stuff
+	@Override
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	@Override
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
+		if (packet.getTag() != null)
+			load(packet.getTag());
+	}
+
+	@Override
+	public CompoundTag getUpdateTag() {
+		CompoundTag tag = new CompoundTag();
+		saveAdditional(tag);
+		return tag;
+	}
+
+	@Override
+	public void handleUpdateTag(CompoundTag tag) {
+		super.handleUpdateTag(tag);
+	}
+
+	@Override
+	public CompoundTag getPersistentData() {
+		CompoundTag tag = new CompoundTag();
+		this.saveAdditional(tag);
+		return tag;
+	}
+}

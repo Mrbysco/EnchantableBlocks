@@ -1,0 +1,13 @@
+{
+  "values": [
+    "enchantableblocks:ranged",
+    "enchantableblocks:concealed",
+    "enchantableblocks:glintless",
+    "minecraft:sharpness",
+    "minecraft:vanishing_curse",
+    {
+      "id": "stickerframes:foiled",
+      "required": false
+    }
+  ]
+}

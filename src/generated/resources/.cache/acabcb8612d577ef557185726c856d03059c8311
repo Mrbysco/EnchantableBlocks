@@ -1,0 +1,14 @@
+// 1.20.1	2024-04-13T19:28:58.0293967	Tags for minecraft:block mod id enchantableblocks
+b3125c751a2a63cafbdf55754db6056209efd15a data/forge/tags/blocks/chests/trapped.json
+41e5e9b164f0dbf49c15bff43d0c6dbd7d83a35f data/forge/tags/blocks/chests/wooden.json
+8416108716cd31d9217e28e72e00e073fefdc1bb data/minecraft/tags/blocks/beds.json
+afdcc462d91ec1a392adaa14e5dfea1969e1c977 data/minecraft/tags/blocks/beehives.json
+2ee97e1c091859775d93eb8d449be0b8d8ac8316 data/minecraft/tags/blocks/campfires.json
+cf3fc3f3d9d8295dbb3652896d638674f3c6b8ed data/minecraft/tags/blocks/dragon_immune.json
+41e5e9b164f0dbf49c15bff43d0c6dbd7d83a35f data/minecraft/tags/blocks/guarded_by_piglins.json
+cf3fc3f3d9d8295dbb3652896d638674f3c6b8ed data/minecraft/tags/blocks/hoglin_repellents.json
+017a0362515cb79606884875adf80fcdf8676504 data/minecraft/tags/blocks/infiniburn_overworld.json
+29e113626047cc8b83ae111167f680edb0b005d4 data/minecraft/tags/blocks/mineable/axe.json
+acd44a2e73e87d081a943cbd8f5bd918d4183c53 data/minecraft/tags/blocks/mineable/pickaxe.json
+cf3fc3f3d9d8295dbb3652896d638674f3c6b8ed data/minecraft/tags/blocks/needs_diamond_tool.json
+99ea1b1dd0981c76ff051fd6fa7fdd0d47069b08 data/minecraft/tags/blocks/piglin_repellents.json

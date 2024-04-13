@@ -1,0 +1,18 @@
+{
+  "values": [
+    "enchantableblocks:speed",
+    "enchantableblocks:fuel_efficiency",
+    "enchantableblocks:yield",
+    "enchantableblocks:preservation",
+    "enchantableblocks:solar_radiance",
+    "enchantableblocks:exporting",
+    "enchantableblocks:concealed",
+    "enchantableblocks:glintless",
+    "minecraft:vanishing_curse",
+    "minecraft:blast_protection",
+    {
+      "id": "stickerframes:foiled",
+      "required": false
+    }
+  ]
+}

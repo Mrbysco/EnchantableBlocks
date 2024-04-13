@@ -1,0 +1,12 @@
+{
+  "values": [
+    "enchantableblocks:concealed",
+    "enchantableblocks:glintless",
+    "minecraft:efficiency",
+    "minecraft:vanishing_curse",
+    {
+      "id": "stickerframes:foiled",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:copy_name",
+              "source": "block_entity"
+            },
+            {
+              "function": "enchantableblocks:copy_enchantments"
+            }
+          ],
+          "name": "minecraft:magma_block"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "enchantableblocks:blocks/enchanted_magma_block"
+}

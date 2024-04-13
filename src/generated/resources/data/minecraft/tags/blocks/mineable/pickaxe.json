@@ -1,0 +1,13 @@
+{
+  "values": [
+    "enchantableblocks:enchanted_furnace",
+    "enchantableblocks:enchanted_blast_furnace",
+    "enchantableblocks:enchanted_smoker",
+    "enchantableblocks:enchanted_magma_block",
+    "enchantableblocks:enchanted_dispenser",
+    "enchantableblocks:enchanted_respawn_anchor",
+    "enchantableblocks:enchanted_hopper",
+    "enchantableblocks:enchanted_enchanting_table",
+    "enchantableblocks:enchanted_conduit"
+  ]
+}
