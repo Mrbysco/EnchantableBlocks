@@ -69,6 +69,7 @@ public class EnchantableBlocks {
 		ReplacementUtil.addReplacement(Blocks.CRAFTING_TABLE, ModRegistry.ENCHANTED_CRAFTING_TABLE, ModTags.CRAFTING_TABLE_APPLICABLE);
 		ReplacementUtil.addReplacement(Blocks.BEEHIVE, ModRegistry.ENCHANTED_BEEHIVE, ModTags.BEEHIVE_APPLICABLE);
 		ReplacementUtil.addReplacement(Blocks.CHEST, ModRegistry.ENCHANTED_CHEST, ModTags.CHEST_APPLICABLE);
+		ReplacementUtil.addReplacement(Blocks.TRAPPED_CHEST, ModRegistry.ENCHANTED_TRAPPED_CHEST, ModTags.TRAPPED_CHEST_APPLICABLE);
 
 		ReplacementUtil.addReplacement(Blocks.WHITE_BED, ModRegistry.ENCHANTED_WHITE_BED, ModTags.WHITE_BED_APPLICABLE);
 		ReplacementUtil.addReplacement(Blocks.ORANGE_BED, ModRegistry.ENCHANTED_ORANGE_BED, ModTags.ORANGE_BED_APPLICABLE);
