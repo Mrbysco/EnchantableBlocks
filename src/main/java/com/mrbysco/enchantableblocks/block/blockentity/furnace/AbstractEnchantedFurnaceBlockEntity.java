@@ -53,22 +53,24 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 	public static void serverTick(Level level, BlockPos pos, BlockState state, AbstractEnchantedFurnaceBlockEntity blockEntity) {
 		AbstractFurnaceBlockEntityAccessor blockEntityAccessor = (AbstractFurnaceBlockEntityAccessor) blockEntity;
 		final RecipeManager.CachedCheck<Container, ? extends AbstractCookingRecipe> quickCheck = blockEntityAccessor.getQuickCheck();
-		boolean isLit = blockEntity.isLit();
+		boolean wasLit = blockEntity.isLit();
 		boolean changed = false;
-		boolean flag2 = !blockEntity.items.get(0).isEmpty();
+		boolean hasInput = !blockEntity.items.get(0).isEmpty();
+		boolean solar = blockEntity.hasEnchantment(ModEnchantments.SOLAR_RADIANCE.get());
+		boolean solarRequirements = level.isDay() && level.canSeeSky(pos.above());
 
 		if (blockEntity.isLit()) {
 			int speed = blockEntity.getSpeed();
-			if (blockEntity.hasEnchantment(ModEnchantments.SOLAR_RADIANCE.get())) {
-				if (level.isDay() && level.canSeeSky(pos)) {
-					blockEntity.litTime = 20;
+			if (solar) {
+				if (solarRequirements) {
+					blockEntity.litTime = 200;
 				} else {
 					blockEntity.litTime -= speed;
 				}
 			} else {
 				boolean preservation = blockEntity.hasEnchantment(ModEnchantments.PRESERVATION.get());
 				if (preservation) {
-					Recipe<?> recipe = flag2 ? quickCheck.getRecipeFor(blockEntity, level).orElse(null) : null;
+					Recipe<?> recipe = hasInput ? quickCheck.getRecipeFor(blockEntity, level).orElse(null) : null;
 					if (recipe != null)
 						blockEntity.litTime -= speed;
 
@@ -79,21 +81,26 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		}
 
 		ItemStack fuel = blockEntity.items.get(1);
-		boolean flag3 = !fuel.isEmpty();
-		if (blockEntity.isLit() || flag3 && flag2) {
-			Recipe<?> recipe = flag2 ? quickCheck.getRecipeFor(blockEntity, level).orElse(null) : null;
+		boolean hasFuel = !fuel.isEmpty();
+		if (blockEntity.isLit() || ((solar && solarRequirements) || hasFuel) && hasInput) {
+			Recipe<?> recipe = hasInput ? quickCheck.getRecipeFor(blockEntity, level).orElse(null) : null;
 			int i = blockEntity.getMaxStackSize();
-			if (!blockEntity.isLit() && blockEntityAccessor.invokeCanBurn(level.registryAccess(), recipe, blockEntity.items, i)) {
-				blockEntity.litTime = blockEntity.getBurnDuration(fuel);
-				blockEntity.litDuration = blockEntity.litTime;
-				if (blockEntity.isLit()) {
-					changed = true;
-					if (fuel.hasCraftingRemainingItem())
-						blockEntity.items.set(1, fuel.getCraftingRemainingItem());
-					else if (flag3) {
-						fuel.shrink(1);
-						if (fuel.isEmpty()) {
+			if (!blockEntity.isLit()) {
+				if (solar && solarRequirements) {
+					blockEntity.litTime = 200;
+					blockEntity.litDuration = blockEntity.litTime;
+				} else if (blockEntityAccessor.invokeCanBurn(level.registryAccess(), recipe, blockEntity.items, i)) {
+					blockEntity.litTime = blockEntity.getBurnDuration(fuel);
+					blockEntity.litDuration = blockEntity.litTime;
+					if (blockEntity.isLit()) {
+						changed = true;
+						if (fuel.hasCraftingRemainingItem())
 							blockEntity.items.set(1, fuel.getCraftingRemainingItem());
+						else if (hasFuel) {
+							fuel.shrink(1);
+							if (fuel.isEmpty()) {
+								blockEntity.items.set(1, fuel.getCraftingRemainingItem());
+							}
 						}
 					}
 				}
@@ -118,7 +125,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 			blockEntity.cookingProgress = Mth.clamp(blockEntity.cookingProgress - 2, 0, blockEntity.cookingTotalTime);
 		}
 
-		if (isLit != blockEntity.isLit()) {
+		if (wasLit != blockEntity.isLit()) {
 			changed = true;
 			state = state.setValue(AbstractFurnaceBlock.LIT, blockEntity.isLit());
 			level.setBlock(pos, state, 3);
@@ -134,7 +141,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		if (hasEnchantment(ModEnchantments.SPEED.get())) {
 			int enchantmentLevel = getEnchantmentLevel(ModEnchantments.SPEED.get());
 			//Adjust the speed based on the level of the enchantment
-			speed = speed * (1 + enchantmentLevel / (2 + Math.abs(enchantmentLevel)));
+			speed += enchantmentLevel;
 		}
 		return speed;
 	}

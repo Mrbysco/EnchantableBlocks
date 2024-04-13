@@ -132,7 +132,7 @@ public class EnchantedFurnaceBlock extends FurnaceBlock {
 
 	@Nullable
 	protected static <T extends BlockEntity> BlockEntityTicker<T> createEnchantedFurnaceTicker(Level level, BlockEntityType<T> serverType,
-	                                                                                           BlockEntityType<? extends AbstractFurnaceBlockEntity> clientType) {
+	                                                                                           BlockEntityType<? extends AbstractEnchantedFurnaceBlockEntity> clientType) {
 		return level.isClientSide ? null : createTickerHelper(serverType, clientType, AbstractEnchantedFurnaceBlockEntity::serverTick);
 	}
 }
