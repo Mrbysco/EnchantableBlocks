@@ -71,23 +71,14 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 			int count = 1;
 			if (blockEntity.hasEnchantment(Enchantments.BLOCK_EFFICIENCY)) {
 				int enchantmentLevel = Mth.clamp(blockEntity.getEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY), 0, 5);
-				switch (enchantmentLevel) {
-					case 1:
-						count = 4;
-						break;
-					case 2:
-						count = 8;
-						break;
-					case 3:
-						count = 16;
-						break;
-					case 4:
-						count = 32;
-						break;
-					case 5:
-						count = 64;
-						break;
-				}
+				count = switch (enchantmentLevel) {
+					case 1 -> 4;
+					case 2 -> 8;
+					case 3 -> 16;
+					case 4 -> 32;
+					case 5 -> 64;
+					default -> count;
+				};
 			}
 			blockEntity.setCooldown(0);
 			int finalCount = count;
@@ -213,8 +204,7 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 		if (!pDestination.canTakeItem(pSource, pSlot, pStack)) {
 			return false;
 		} else {
-			if (pDestination instanceof WorldlyContainer) {
-				WorldlyContainer worldlycontainer = (WorldlyContainer) pDestination;
+			if (pDestination instanceof WorldlyContainer worldlycontainer) {
 				if (!worldlycontainer.canTakeItemThroughFace(pSlot, pStack, pDirection)) {
 					return false;
 				}
@@ -251,23 +241,14 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 		int count = 1;
 		if (sourceContainer.hasEnchantment(Enchantments.BLOCK_EFFICIENCY)) {
 			int enchantmentLevel = Mth.clamp(sourceContainer.getEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY), 0, 5);
-			switch (enchantmentLevel) {
-				case 1:
-					count = 4;
-					break;
-				case 2:
-					count = 8;
-					break;
-				case 3:
-					count = 16;
-					break;
-				case 4:
-					count = 32;
-					break;
-				case 5:
-					count = 64;
-					break;
-			}
+			count = switch (enchantmentLevel) {
+				case 1 -> 4;
+				case 2 -> 8;
+				case 3 -> 16;
+				case 4 -> 32;
+				case 5 -> 64;
+				default -> count;
+			};
 		}
 		Direction direction = state.getValue(HopperBlock.FACING);
 		BlockEntity blockEntity = level.getBlockEntity(pos.relative(direction));
