@@ -35,19 +35,21 @@ public class EnchantedEnchantTableRenderer extends EnchantTableRenderer {
 			renderEnchantment = !enchantable.hideGlint();
 		}
 
-		poseStack.pushPose();
-		PoseStack.Pose pose = poseStack.last();
-		VertexConsumer consumer = new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose.pose(), pose.normal(), 0.0078125F);
-		blockRenderDispatcher.renderBatched(
-				blockEntity.getBlockState(),
-				blockEntity.getBlockPos(),
-				blockEntity.getLevel(),
-				poseStack,
-				consumer,
-				true,
-				RANDOM,
-				ModelData.EMPTY,
-				null);
-		poseStack.popPose();
+		if (renderEnchantment) {
+			poseStack.pushPose();
+			PoseStack.Pose pose = poseStack.last();
+			VertexConsumer consumer = new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose.pose(), pose.normal(), 0.0078125F);
+			blockRenderDispatcher.renderBatched(
+					blockEntity.getBlockState(),
+					blockEntity.getBlockPos(),
+					blockEntity.getLevel(),
+					poseStack,
+					consumer,
+					true,
+					RANDOM,
+					ModelData.EMPTY,
+					null);
+			poseStack.popPose();
+		}
 	}
 }
