@@ -9,7 +9,6 @@ import com.mrbysco.enchantableblocks.block.EnchantedChestBlock;
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedTrappedChestBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.client.CustomRenderType;
-import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
