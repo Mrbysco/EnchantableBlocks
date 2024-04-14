@@ -1,5 +1,6 @@
 package com.mrbysco.enchantableblocks.block.blockentity;
 
+import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.util.TagHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.Map;
 
 public abstract class AbstractEnchantedBlockEntity extends BlockEntity implements IEnchantable {
+	protected boolean hideGlint = false;
 	protected ListTag enchantmentTag = null;
 	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
 
@@ -83,7 +85,13 @@ public abstract class AbstractEnchantedBlockEntity extends BlockEntity implement
 					this.enchantments.put(enchantment, integer);
 				}
 			});
+			this.hideGlint = this.hasEnchantment(ModEnchantments.GLINTLESS.get());
 		}
+	}
+
+	@Override
+	public boolean hideGlint() {
+		return this.hideGlint;
 	}
 
 	@Override

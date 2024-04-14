@@ -22,4 +22,6 @@ public interface IEnchantable {
 	boolean hasEnchantment(TagKey<Enchantment> enchantmentTag);
 
 	int getEnchantmentLevel(TagKey<Enchantment> enchantmentTag);
+
+	boolean hideGlint();
 }

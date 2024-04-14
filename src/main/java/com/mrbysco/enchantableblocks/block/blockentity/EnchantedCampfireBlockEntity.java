@@ -32,6 +32,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import java.util.Map;
 
 public class EnchantedCampfireBlockEntity extends CampfireBlockEntity implements IEnchantable {
+	protected boolean hideGlint = false;
 	protected ListTag enchantmentTag = null;
 	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
 
@@ -176,7 +177,13 @@ public class EnchantedCampfireBlockEntity extends CampfireBlockEntity implements
 					this.enchantments.put(enchantment, integer);
 				}
 			});
+			this.hideGlint = this.hasEnchantment(ModEnchantments.GLINTLESS.get());
 		}
+	}
+
+	@Override
+	public boolean hideGlint() {
+		return this.hideGlint;
 	}
 
 	@Override

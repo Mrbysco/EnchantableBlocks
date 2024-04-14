@@ -47,6 +47,7 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.IntStream;
 
 public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEnchantable {
+	protected boolean hideGlint = false;
 	protected ListTag enchantmentTag = null;
 	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
 
@@ -398,7 +399,13 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 					this.enchantments.put(enchantment, integer);
 				}
 			});
+			this.hideGlint = this.hasEnchantment(ModEnchantments.GLINTLESS.get());
 		}
+	}
+
+	@Override
+	public boolean hideGlint() {
+		return this.hideGlint;
 	}
 
 	@Override

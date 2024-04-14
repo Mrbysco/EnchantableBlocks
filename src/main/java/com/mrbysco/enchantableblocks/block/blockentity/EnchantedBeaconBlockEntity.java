@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 public class EnchantedBeaconBlockEntity extends BeaconBlockEntity implements IEnchantable {
+	protected boolean hideGlint;
 	protected ListTag enchantmentTag = null;
 	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
 
@@ -215,7 +216,13 @@ public class EnchantedBeaconBlockEntity extends BeaconBlockEntity implements IEn
 					this.enchantments.put(enchantment, integer);
 				}
 			});
+			this.hideGlint = this.hasEnchantment(ModEnchantments.GLINTLESS.get());
 		}
+	}
+
+	@Override
+	public boolean hideGlint() {
+		return this.hideGlint;
 	}
 
 	@Override

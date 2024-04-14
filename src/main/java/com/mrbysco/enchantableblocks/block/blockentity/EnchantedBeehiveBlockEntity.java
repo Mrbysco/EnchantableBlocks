@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.Map;
 
 public class EnchantedBeehiveBlockEntity extends BeehiveBlockEntity implements IEnchantable {
+	protected boolean hideGlint = false;
 	protected ListTag enchantmentTag = null;
 	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
 
@@ -113,7 +114,13 @@ public class EnchantedBeehiveBlockEntity extends BeehiveBlockEntity implements I
 					this.enchantments.put(enchantment, integer);
 				}
 			});
+			this.hideGlint = this.hasEnchantment(ModEnchantments.GLINTLESS.get());
 		}
+	}
+
+	@Override
+	public boolean hideGlint() {
+		return this.hideGlint;
 	}
 
 	@Override

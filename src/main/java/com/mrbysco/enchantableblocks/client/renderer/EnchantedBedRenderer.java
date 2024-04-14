@@ -38,9 +38,7 @@ public class EnchantedBedRenderer extends BedRenderer {
 	                   MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
 		if (blockEntity.getLevel() == null) return;
 		if (blockEntity instanceof IEnchantable enchantable) {
-			if (enchantable.hasEnchantment(ModEnchantments.GLINTLESS.get())) {
-				renderEnchantment = false;
-			}
+			renderEnchantment = !enchantable.hideGlint();
 		}
 
 		Material material = Sheets.BED_TEXTURES[blockEntity.getColor().getId()];

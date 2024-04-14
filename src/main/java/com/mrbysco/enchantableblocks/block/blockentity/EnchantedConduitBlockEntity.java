@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 public class EnchantedConduitBlockEntity extends ConduitBlockEntity implements IEnchantable {
+	protected boolean hideGlint = false;
 	protected ListTag enchantmentTag = null;
 	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
 
@@ -246,7 +247,13 @@ public class EnchantedConduitBlockEntity extends ConduitBlockEntity implements I
 					this.enchantments.put(enchantment, integer);
 				}
 			});
+			this.hideGlint = this.hasEnchantment(ModEnchantments.GLINTLESS.get());
 		}
+	}
+
+	@Override
+	public boolean hideGlint() {
+		return this.hideGlint;
 	}
 
 	@Override

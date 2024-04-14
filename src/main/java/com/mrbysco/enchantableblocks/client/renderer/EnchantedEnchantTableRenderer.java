@@ -32,14 +32,8 @@ public class EnchantedEnchantTableRenderer extends EnchantTableRenderer {
 		super.render(blockEntity, partialTick, poseStack, bufferSource, packedLight, packedOverlay);
 
 		if (blockEntity.getLevel() == null) return;
-		if (!renderEnchantment) {
-			return;
-		}
 		if (blockEntity instanceof IEnchantable enchantable) {
-			if (enchantable.hasEnchantment(ModEnchantments.GLINTLESS.get())) {
-				renderEnchantment = false;
-				return;
-			}
+			renderEnchantment = !enchantable.hideGlint();
 		}
 
 		poseStack.pushPose();

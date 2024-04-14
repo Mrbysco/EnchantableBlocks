@@ -29,12 +29,8 @@ public class EnchantedConduitRenderer extends ConduitRenderer {
 	public void render(ConduitBlockEntity blockEntity, float partialTick, PoseStack poseStack,
 	                   MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
 		if (blockEntity.getLevel() == null) return;
-
 		if (blockEntity instanceof IEnchantable enchantable) {
-			if (enchantable.hasEnchantment(ModEnchantments.GLINTLESS.get())) {
-				renderEnchantment = false;
-				return;
-			}
+			renderEnchantment = !enchantable.hideGlint();
 		}
 
 		float f = (float) blockEntity.tickCount + partialTick;
