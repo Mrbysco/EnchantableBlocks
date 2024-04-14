@@ -9,7 +9,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -56,6 +58,11 @@ public class EnchantedDispenserBlock extends DispenserBlock {
 			}
 
 		}
+	}
+
+	@Override
+	public Item asItem() {
+		return Items.DISPENSER;
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -39,6 +40,11 @@ public class EnchantedCampfireBlock extends CampfireBlock {
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new EnchantedCampfireBlockEntity(pos, state);
+	}
+
+	@Override
+	public Item asItem() {
+		return originalBlock.get().asItem();
 	}
 
 	@Nullable

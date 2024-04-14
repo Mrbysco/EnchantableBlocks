@@ -11,7 +11,9 @@ import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -38,6 +40,11 @@ public class EnchantedTrappedChestBlock extends EnchantedChestBlock {
 	@Override
 	protected Stat<ResourceLocation> getOpenChestStat() {
 		return Stats.CUSTOM.get(Stats.TRIGGER_TRAPPED_CHEST);
+	}
+
+	@Override
+	public Item asItem() {
+		return Items.TRAPPED_CHEST;
 	}
 
 	@Override

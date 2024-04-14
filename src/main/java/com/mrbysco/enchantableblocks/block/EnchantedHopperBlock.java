@@ -6,7 +6,9 @@ import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -32,6 +34,11 @@ public class EnchantedHopperBlock extends HopperBlock {
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new EnchantedHopperBlockEntity(pos, state);
+	}
+
+	@Override
+	public Item asItem() {
+		return Items.HOPPER;
 	}
 
 	@Override

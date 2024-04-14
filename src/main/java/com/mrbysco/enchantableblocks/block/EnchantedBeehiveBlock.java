@@ -4,7 +4,9 @@ import com.mrbysco.enchantableblocks.block.blockentity.EnchantedBeehiveBlockEnti
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -28,6 +30,11 @@ public class EnchantedBeehiveBlock extends BeehiveBlock {
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new EnchantedBeehiveBlockEntity(pos, state);
+	}
+
+	@Override
+	public Item asItem() {
+		return Items.BEEHIVE;
 	}
 
 	@Override

@@ -9,7 +9,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -51,6 +53,11 @@ public class EnchantedCraftingTableBlock extends CraftingTableBlock implements E
 
 			return InteractionResult.CONSUME;
 		}
+	}
+
+	@Override
+	public Item asItem() {
+		return Items.CRAFTING_TABLE;
 	}
 
 	@Override

@@ -20,7 +20,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
@@ -182,6 +184,11 @@ public class EnchantedChestBlock extends AbstractChestBlock<EnchantedChestBlockE
 		if (blockentity instanceof EnchantedChestBlockEntity chestBlockEntity) {
 			chestBlockEntity.recheckOpen();
 		}
+	}
+
+	@Override
+	public Item asItem() {
+		return Items.CHEST;
 	}
 
 	@Override

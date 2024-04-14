@@ -13,7 +13,9 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -63,6 +65,11 @@ public class EnchantedEnchantmentTableBlock extends EnchantmentTableBlock {
 			}
 		}
 		return super.getDrops(state, params);
+	}
+
+	@Override
+	public Item asItem() {
+		return Items.ENCHANTING_TABLE;
 	}
 
 	@Override

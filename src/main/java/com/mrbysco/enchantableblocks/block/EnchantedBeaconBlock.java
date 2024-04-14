@@ -5,7 +5,9 @@ import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -35,6 +37,11 @@ public class EnchantedBeaconBlock extends BeaconBlock {
 	@Nullable
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
 		return createTickerHelper(blockEntityType, ModRegistry.ENCHANTED_BEACON_BLOCK_ENTITY.get(), EnchantedBeaconBlockEntity::tick);
+	}
+
+	@Override
+	public Item asItem() {
+		return Items.SMOKER;
 	}
 
 	@Override

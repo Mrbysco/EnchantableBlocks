@@ -6,7 +6,9 @@ import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
@@ -49,6 +51,11 @@ public class EnchantedMagmaBlock extends MagmaBlock implements EntityBlock {
 		}
 
 		super.stepOn(level, pos, state, entity);
+	}
+
+	@Override
+	public Item asItem() {
+		return Items.MAGMA_BLOCK;
 	}
 
 	@Override
