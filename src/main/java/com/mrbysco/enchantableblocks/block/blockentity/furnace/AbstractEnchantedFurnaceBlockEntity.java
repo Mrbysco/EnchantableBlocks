@@ -151,11 +151,11 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		if (pRecipe != null && ((AbstractFurnaceBlockEntityAccessor) this).invokeCanBurn(pRegistryAccess, pRecipe, inventory, pMaxStackSize)) {
 			ItemStack inputStack = inventory.get(0);
 			ItemStack craftedStack = ((Recipe<WorldlyContainer>) pRecipe).assemble(this, pRegistryAccess);
-			if (hasEnchantment(ModEnchantments.YIELD.get())) {
+			if (hasEnchantment(ModEnchantments.YIELD.get()) && craftedStack.getCount() < craftedStack.getMaxStackSize()) {
 				int enchantmentLevel = getEnchantmentLevel(ModEnchantments.YIELD.get());
 				//Adjust the craftedStack based on the level of the enchantment
-				int count = (enchantmentLevel + 1) / 2 + 1 / (enchantmentLevel + 2);
-				craftedStack.setCount(count);
+				int count = 1 + enchantmentLevel;
+				craftedStack.setCount(Mth.clamp(count, 1, craftedStack.getMaxStackSize()));
 			}
 
 			ItemStack resultStack = inventory.get(2);
@@ -216,7 +216,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		if (burnDuration != 0 && this.hasEnchantment(ModEnchantments.FUEL_EFFICIENCY.get())) {
 			int enchantmentLevel = this.getEnchantmentLevel(ModEnchantments.FUEL_EFFICIENCY.get());
 			//Adjust the burnDuration based on the level of the enchantment
-			burnDuration = burnDuration * (1 + enchantmentLevel / (3 + Math.abs(enchantmentLevel)));
+			burnDuration = Mth.ceil(1 + (enchantmentLevel * 0.2));
 		}
 		return burnDuration;
 	}
