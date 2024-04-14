@@ -42,7 +42,7 @@ public class ModTags {
 	public static final TagKey<Enchantment> RED_BED_APPLICABLE = modTag("applicable/red_bed");
 	public static final TagKey<Enchantment> BLACK_BED_APPLICABLE = modTag("applicable/black_bed");
 
-	public class General {
+	public static class General {
 		public static final TagKey<Enchantment> STORAGE_UPGRADE = modTag("storage_upgrade");
 
 	}
