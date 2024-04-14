@@ -42,6 +42,7 @@ import javax.annotation.Nullable;
 import java.util.Map;
 
 public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnaceBlockEntity implements IEnchantable {
+	protected boolean hideGlint = false;
 	protected ListTag enchantmentTag = null;
 	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
 
@@ -282,7 +283,13 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 					this.enchantments.put(enchantment, integer);
 				}
 			});
+			this.hideGlint = this.hasEnchantment(ModEnchantments.GLINTLESS.get());
 		}
+	}
+
+	@Override
+	public boolean hideGlint() {
+		return this.hideGlint;
 	}
 
 	@Override
