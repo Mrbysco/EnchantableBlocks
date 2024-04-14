@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexMultiConsumer;
 import com.mojang.math.Axis;
 import com.mrbysco.enchantableblocks.block.EnchantedChestBlock;
+import com.mrbysco.enchantableblocks.block.blockentity.EnchantedTrappedChestBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.client.CustomRenderType;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
@@ -28,7 +29,6 @@ import net.minecraft.world.level.block.DoubleBlockCombiner;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
-import net.minecraft.world.level.block.entity.TrappedChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Calendar;
@@ -88,10 +88,15 @@ public class EnchantedChestRenderer<T extends BlockEntity & LidBlockEntity> impl
 			int i = result.apply(new BrightnessCombiner<>()).applyAsInt(packedLight);
 			Material material = this.getMaterial(blockEntity);
 			PoseStack.Pose pose = poseStack.last();
-			VertexConsumer vertexconsumer = VertexMultiConsumer.create(
-					new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose.pose(), pose.normal(), 0.0078125F),
-					material.buffer(bufferSource, RenderType::entityCutout)
-			);
+			VertexConsumer vertexconsumer;
+			if (renderEnchantment) {
+				vertexconsumer = VertexMultiConsumer.create(
+						new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose.pose(), pose.normal(), 0.0078125F),
+						material.buffer(bufferSource, RenderType::entityCutout)
+				);
+			} else {
+				vertexconsumer = material.buffer(bufferSource, RenderType::entityCutout);
+			}
 			this.render(poseStack, vertexconsumer, this.lid, this.lock, this.bottom, f1, i, packedOverlay);
 
 			poseStack.popPose();
@@ -111,7 +116,7 @@ public class EnchantedChestRenderer<T extends BlockEntity & LidBlockEntity> impl
 		if (this.xmasTextures) {
 			return Sheets.CHEST_XMAS_LOCATION;
 		} else {
-			return blockEntity instanceof TrappedChestBlockEntity ? Sheets.CHEST_TRAP_LOCATION : Sheets.CHEST_LOCATION;
+			return blockEntity instanceof EnchantedTrappedChestBlockEntity ? Sheets.CHEST_TRAP_LOCATION : Sheets.CHEST_LOCATION;
 		}
 	}
 }
