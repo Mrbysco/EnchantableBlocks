@@ -2,7 +2,9 @@ package com.mrbysco.enchantableblocks.block;
 
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedCraftingTableBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
+import com.mrbysco.enchantableblocks.util.MiscHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -80,6 +82,24 @@ public class EnchantedCraftingTableBlock extends CraftingTableBlock implements E
 			}
 		}
 		return explosionResistance;
+	}
+
+	@Override
+	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (!state.is(newState.getBlock())) {
+			BlockEntity blockentity = level.getBlockEntity(pos);
+			if (blockentity instanceof EnchantedCraftingTableBlockEntity craftingTableBlockEntity) {
+				if (level instanceof ServerLevel) {
+					if (!craftingTableBlockEntity.hasEnchantment(Enchantments.VANISHING_CURSE)) {
+						for (int i = 0; i < craftingTableBlockEntity.handler.getSlots(); ++i) {
+							MiscHelper.spawnItemStack(level, pos.getX(), pos.getY(), pos.getZ(), craftingTableBlockEntity.handler.getStackInSlot(i));
+						}
+					}
+				}
+			}
+
+			super.onRemove(state, level, pos, newState, isMoving);
+		}
 	}
 
 	@Override

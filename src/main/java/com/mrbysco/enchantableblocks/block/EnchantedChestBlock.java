@@ -5,6 +5,7 @@ import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModMenus;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
+import com.mrbysco.enchantableblocks.util.MiscHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -222,6 +223,24 @@ public class EnchantedChestBlock extends AbstractChestBlock<EnchantedChestBlockE
 			}
 		}
 		return super.getDrops(state, params);
+	}
+
+	@Override
+	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (!state.is(newState.getBlock())) {
+			BlockEntity blockentity = level.getBlockEntity(pos);
+			if (blockentity instanceof EnchantedChestBlockEntity craftingTableBlockEntity) {
+				if (level instanceof ServerLevel) {
+					if (!craftingTableBlockEntity.hasEnchantment(Enchantments.VANISHING_CURSE)) {
+						for (int i = 0; i < craftingTableBlockEntity.handler.getSlots(); ++i) {
+							MiscHelper.spawnItemStack(level, pos.getX(), pos.getY(), pos.getZ(), craftingTableBlockEntity.handler.getStackInSlot(i));
+						}
+					}
+				}
+			}
+
+			super.onRemove(state, level, pos, newState, isMoving);
+		}
 	}
 
 	@Override
