@@ -2,7 +2,6 @@ package com.mrbysco.enchantableblocks.block;
 
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedEnchantmentTableBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
-import com.mrbysco.enchantableblocks.block.blockentity.furnace.AbstractEnchantedFurnaceBlockEntity;
 import com.mrbysco.enchantableblocks.menu.EnchantedEnchantmentMenu;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
@@ -21,7 +20,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EnchantmentTableBlock;
-import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -102,13 +100,8 @@ public class EnchantedEnchantmentTableBlock extends EnchantmentTableBlock {
 
 	@Nullable
 	@Override
-	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-		return createEnchantedFurnaceTicker(level, blockEntityType, ModRegistry.ENCHANTED_FURNACE_BLOCK_ENTITY.get());
-	}
-
-	@Nullable
-	protected static <T extends BlockEntity> BlockEntityTicker<T> createEnchantedFurnaceTicker(Level level, BlockEntityType<T> serverType,
-	                                                                                           BlockEntityType<? extends AbstractFurnaceBlockEntity> clientType) {
-		return level.isClientSide ? null : createTickerHelper(serverType, clientType, AbstractEnchantedFurnaceBlockEntity::serverTick);
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
+		return pLevel.isClientSide ? createTickerHelper(pBlockEntityType, ModRegistry.ENCHANTED_ENCHANTING_TABLE_BLOCK_ENTITY.get(),
+				EnchantedEnchantmentTableBlockEntity::bookAnimationTick) : null;
 	}
 }
