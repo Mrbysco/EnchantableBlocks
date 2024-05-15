@@ -12,10 +12,10 @@ import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.RespawnAnchorBlock;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.registries.DeferredBlock;
 
 public class EnchantableBlockstateProvider extends BlockStateProvider {
 	public EnchantableBlockstateProvider(PackOutput packOutput, ExistingFileHelper helper) {
@@ -59,18 +59,18 @@ public class EnchantableBlockstateProvider extends BlockStateProvider {
 		simpleCutoutEnchantedBlock(ModRegistry.ENCHANTED_BLACK_BED, "bed");
 	}
 
-	private void simpleCutoutEnchantedBlock(RegistryObject<Block> enchantedBlock, String originalBlock) {
+	private void simpleCutoutEnchantedBlock(DeferredBlock<? extends Block> enchantedBlock, String originalBlock) {
 		simpleBlock(enchantedBlock.get(), models()
 				.withExistingParent("enchantableblocks:block/" + enchantedBlock.getId().getPath(), "minecraft:block/" + originalBlock).renderType(new ResourceLocation("cutout")));
 	}
 
-	private void beehive(RegistryObject<Block> registryObject) {
+	private void beehive(DeferredBlock<? extends Block> registryObject) {
 		ModelFile beehive = models().getExistingFile(mcLoc("beehive"));
 		ModelFile beehiveHoney = models().getExistingFile(mcLoc("beehive_honey"));
 		horizontalBlock(registryObject.get(), (state -> state.getValue(BlockStateProperties.LEVEL_HONEY) == 5 ? beehiveHoney : beehive));
 	}
 
-	private void campfire(RegistryObject<Block> registryObject, String originalBlock) {
+	private void campfire(DeferredBlock<? extends Block> registryObject, String originalBlock) {
 		ModelFile offModel = this.models().getExistingFile(mcLoc("campfire_off"));
 		ModelFile model = this.models().getExistingFile(mcLoc(originalBlock));
 		this.getVariantBuilder(registryObject.get())
@@ -92,7 +92,7 @@ public class EnchantableBlockstateProvider extends BlockStateProvider {
 				.modelForState().modelFile(model).rotationY(90).addModel();
 	}
 
-	private void abstractFurnace(RegistryObject<Block> block, String originalBlock) {
+	private void abstractFurnace(DeferredBlock<? extends Block> block, String originalBlock) {
 		ModelFile normal = this.models().getExistingFile(mcLoc(originalBlock));
 		ModelFile lit = this.models().getExistingFile(mcLoc(originalBlock + "_on"));
 		this.getVariantBuilder(block.get())
@@ -114,7 +114,7 @@ public class EnchantableBlockstateProvider extends BlockStateProvider {
 				.modelForState().modelFile(lit).rotationY(270).addModel();
 	}
 
-	private void dispenser(RegistryObject<Block> block) {
+	private void dispenser(DeferredBlock<? extends Block> block) {
 		ModelFile model = this.models().getExistingFile(mcLoc("dispenser"));
 		ModelFile vertical = this.models().getExistingFile(mcLoc("dispenser_vertical"));
 		this.getVariantBuilder(block.get())
@@ -132,7 +132,7 @@ public class EnchantableBlockstateProvider extends BlockStateProvider {
 				.modelForState().modelFile(model).rotationY(270).addModel();
 	}
 
-	private void hopper(RegistryObject<Block> block) {
+	private void hopper(DeferredBlock<? extends Block> block) {
 		ModelFile model = this.models().getExistingFile(mcLoc("hopper"));
 		ModelFile side = this.models().getExistingFile(mcLoc("hopper_side"));
 		this.getVariantBuilder(block.get())
@@ -148,7 +148,7 @@ public class EnchantableBlockstateProvider extends BlockStateProvider {
 				.modelForState().modelFile(side).rotationY(270).addModel();
 	}
 
-	private void respawnAnchor(RegistryObject<Block> block) {
+	private void respawnAnchor(DeferredBlock<? extends Block> block) {
 		ModelFile charge0 = this.models().getExistingFile(mcLoc("respawn_anchor_0"));
 		ModelFile charge1 = this.models().getExistingFile(mcLoc("respawn_anchor_1"));
 		ModelFile charge2 = this.models().getExistingFile(mcLoc("respawn_anchor_2"));

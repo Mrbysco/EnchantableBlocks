@@ -28,10 +28,7 @@ import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,7 +74,6 @@ public class EnchantedChestBlockEntity extends AbstractEnchantedBlockEntity impl
 			}
 		}
 	};
-	private final LazyOptional<IItemHandler> handlerHolder = LazyOptional.of(() -> handler);
 	private final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
 		protected void onOpen(Level level, BlockPos pos, BlockState state) {
 			EnchantedChestBlockEntity.playSound(level, pos, state, SoundEvents.CHEST_OPEN);
@@ -285,17 +281,7 @@ public class EnchantedChestBlockEntity extends AbstractEnchantedBlockEntity impl
 		}
 	}
 
-	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-		if (!this.remove && cap == net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER) {
-			return this.handlerHolder.cast();
-		}
-		return super.getCapability(cap, side);
-	}
-
-	@Override
-	public void invalidateCaps() {
-		super.invalidateCaps();
-		this.handlerHolder.invalidate();
+	public ItemStackHandler getHandler(@Nullable Direction direction) {
+		return handler;
 	}
 }

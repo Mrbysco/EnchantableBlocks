@@ -5,7 +5,7 @@ import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
@@ -27,7 +27,7 @@ public class JadeCompat implements IWailaPlugin {
 	@Override
 	public void registerClient(IWailaClientRegistration registration) {
 		List<Class<? extends Block>> blockClasses = new ArrayList<>();
-		for (RegistryObject<Block> registryObject : ModRegistry.BLOCKS.getEntries()) {
+		for (DeferredHolder<Block, ? extends Block> registryObject : ModRegistry.BLOCKS.getEntries()) {
 			Block block = registryObject.get();
 			Class<? extends Block> blockClass = block.getClass();
 			if (!blockClasses.contains(blockClass)) {

@@ -1,4 +1,4 @@
-// 1.20.1	2024-04-13T19:28:58.0293967	Tags for minecraft:block mod id enchantableblocks
+// 1.20.4	2024-05-15T21:42:12.0568527	Tags for minecraft:block mod id enchantableblocks
 b3125c751a2a63cafbdf55754db6056209efd15a data/forge/tags/blocks/chests/trapped.json
 41e5e9b164f0dbf49c15bff43d0c6dbd7d83a35f data/forge/tags/blocks/chests/wooden.json
 8416108716cd31d9217e28e72e00e073fefdc1bb data/minecraft/tags/blocks/beds.json

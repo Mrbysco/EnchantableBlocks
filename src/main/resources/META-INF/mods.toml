@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[47,)"
+loaderVersion="[2,)"
 issueTrackerURL="https://github.com/Mrbysco/EnchantableBlocks/issues"
 license="MIT"
 
@@ -16,7 +16,15 @@ Allows enchanting of some blocks to change how they function
 
 [[dependencies.enchantableblocks]]
 modId="minecraft"
-mandatory=true
-versionRange="[1.20.1,1.21)"
+type="required"
+versionRange="[1.20.4,1.21)"
 ordering="NONE"
 side="BOTH"
+[[dependencies.enchantableblocks]]
+modId="neoforge"
+type="required"
+versionRange="[20.4.167,)"
+ordering="NONE"
+side="BOTH"
+[[mixins]]
+config="enchantableblocks.mixins.json"

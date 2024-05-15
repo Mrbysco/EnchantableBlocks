@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
-import net.minecraftforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
 public class EnchantedBeaconRenderer extends BeaconRenderer {
 

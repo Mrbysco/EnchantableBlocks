@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.CampfireRenderer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.entity.CampfireBlockEntity;
-import net.minecraftforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
 public class EnchantedCampfireRenderer extends CampfireRenderer {
 

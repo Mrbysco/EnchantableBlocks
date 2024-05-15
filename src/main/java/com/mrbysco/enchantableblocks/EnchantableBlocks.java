@@ -4,21 +4,18 @@ import com.mojang.logging.LogUtils;
 import com.mrbysco.enchantableblocks.client.ClientHandler;
 import com.mrbysco.enchantableblocks.compat.top.TOPCompat;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
-import com.mrbysco.enchantableblocks.registry.ModLootFunctions;
 import com.mrbysco.enchantableblocks.registry.ModMenus;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import com.mrbysco.enchantableblocks.registry.ModTags;
 import com.mrbysco.enchantableblocks.util.ReplacementUtil;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.server.ServerStartedEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.slf4j.Logger;
 
 @Mod(EnchantableBlocks.MOD_ID)
@@ -26,25 +23,23 @@ public class EnchantableBlocks {
 	public static final String MOD_ID = "enchantableblocks";
 	public static final Logger LOGGER = LogUtils.getLogger();
 
-	public EnchantableBlocks() {
-		IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
+	public EnchantableBlocks(IEventBus eventBus) {
 		ModRegistry.BLOCKS.register(eventBus);
 		ModRegistry.BLOCK_ENTITY_TYPES.register(eventBus);
 		ModRegistry.ITEMS.register(eventBus);
 		ModEnchantments.ENCHANTMENTS.register(eventBus);
 		ModMenus.MENU_TYPES.register(eventBus);
-		ModLootFunctions.LOOT_ITEM_FUNCTIONS.register(eventBus);
 
+		eventBus.addListener(ModRegistry::registerCapabilities);
 		eventBus.addListener(this::sendImc);
 
-		MinecraftForge.EVENT_BUS.addListener(this::onServerStarted);
+		NeoForge.EVENT_BUS.addListener(this::onServerStarted);
 
-		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+		if (FMLEnvironment.dist.isClient()) {
 			eventBus.addListener(ClientHandler::onClientSetup);
 			eventBus.addListener(ClientHandler::registerRenderers);
-			eventBus.addListener(ClientHandler::loadComplete);
-		});
+			eventBus.addListener(ClientHandler::onRegisterRenderTypes);
+		}
 	}
 
 	public void sendImc(InterModEnqueueEvent event) {

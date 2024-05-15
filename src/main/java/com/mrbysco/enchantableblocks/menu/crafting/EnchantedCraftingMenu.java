@@ -23,6 +23,7 @@ import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -88,11 +89,11 @@ public class EnchantedCraftingMenu extends RecipeBookMenu<CraftingContainer> {
 		if (!pLevel.isClientSide) {
 			ServerPlayer serverplayer = (ServerPlayer) pPlayer;
 			ItemStack itemstack = ItemStack.EMPTY;
-			Optional<CraftingRecipe> optional = pLevel.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, pContainer, pLevel);
+			Optional<RecipeHolder<CraftingRecipe>> optional = pLevel.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, pContainer, pLevel);
 			if (optional.isPresent()) {
-				CraftingRecipe craftingrecipe = optional.get();
+				RecipeHolder<CraftingRecipe> craftingrecipe = optional.get();
 				if (pResult.setRecipeUsed(pLevel, serverplayer, craftingrecipe)) {
-					ItemStack itemstack1 = craftingrecipe.assemble(pContainer, pLevel.registryAccess());
+					ItemStack itemstack1 = craftingrecipe.value().assemble(pContainer, pLevel.registryAccess());
 					if (itemstack1.isItemEnabled(pLevel.enabledFeatures())) {
 						itemstack = itemstack1;
 					}
@@ -123,8 +124,8 @@ public class EnchantedCraftingMenu extends RecipeBookMenu<CraftingContainer> {
 		this.resultSlots.clearContent();
 	}
 
-	public boolean recipeMatches(Recipe<? super CraftingContainer> recipe) {
-		return recipe.matches(this.craftMatrix, this.player.level());
+	public boolean recipeMatches(RecipeHolder<? extends Recipe<CraftingContainer>> recipe) {
+		return recipe.value().matches(this.craftMatrix, this.player.level());
 	}
 
 	/**

@@ -5,7 +5,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 @Mixin(AbstractFurnaceBlockEntity.class)
 public interface BeehiveBlockEntityAccessor {
 	@Invoker("canBurn")
-	boolean invokeCanBurn(RegistryAccess registryAccess, @Nullable Recipe<?> recipe, NonNullList<ItemStack> inventory, int maxStackSize);
+	boolean invokeCanBurn(RegistryAccess registryAccess, @Nullable RecipeHolder<?> recipe, NonNullList<ItemStack> inventory, int maxStackSize);
 
 	@Accessor("quickCheck")
 	RecipeManager.CachedCheck<Container, ? extends AbstractCookingRecipe> getQuickCheck();

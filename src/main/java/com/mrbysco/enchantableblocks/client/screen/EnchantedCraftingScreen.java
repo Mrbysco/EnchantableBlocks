@@ -27,10 +27,10 @@ public class EnchantedCraftingScreen extends AbstractContainerScreen<EnchantedCr
 		this.widthTooNarrow = this.width < 379;
 		this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
 		this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
-		this.addRenderableWidget(new ImageButton(this.leftPos + 5, this.height / 2 - 49, 20, 18, 0, 0, 19, RECIPE_BUTTON_LOCATION, (p_289630_) -> {
+		this.addRenderableWidget(new ImageButton(this.leftPos + 5, this.height / 2 - 49, 20, 18, RecipeBookComponent.RECIPE_BUTTON_SPRITES, button -> {
 			this.recipeBookComponent.toggleVisibility();
 			this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
-			p_289630_.setPosition(this.leftPos + 5, this.height / 2 - 49);
+			button.setPosition(this.leftPos + 5, this.height / 2 - 49);
 		}));
 		this.addWidget(this.recipeBookComponent);
 		this.setInitialFocus(this.recipeBookComponent);
@@ -50,7 +50,6 @@ public class EnchantedCraftingScreen extends AbstractContainerScreen<EnchantedCr
 	 * @param pPartialTick the partial tick time.
 	 */
 	public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-		this.renderBackground(pGuiGraphics);
 		if (this.recipeBookComponent.isVisible() && this.widthTooNarrow) {
 			this.renderBg(pGuiGraphics, pPartialTick, pMouseX, pMouseY);
 			this.recipeBookComponent.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);

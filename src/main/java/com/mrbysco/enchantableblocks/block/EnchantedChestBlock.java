@@ -1,5 +1,6 @@
 package com.mrbysco.enchantableblocks.block;
 
+import com.mojang.serialization.MapCodec;
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedChestBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
@@ -30,6 +31,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.AbstractChestBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -63,6 +65,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class EnchantedChestBlock extends AbstractChestBlock<EnchantedChestBlockEntity> implements SimpleWaterloggedBlock {
+	public static final MapCodec<EnchantedChestBlock> CODEC = simpleCodec(p_304364_ -> new EnchantedChestBlock(p_304364_, ModRegistry.ENCHANTED_CHEST_BLOCK_ENTITY::get));
+
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	protected static final VoxelShape SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
@@ -71,6 +75,11 @@ public class EnchantedChestBlock extends AbstractChestBlock<EnchantedChestBlockE
 	public EnchantedChestBlock(BlockBehaviour.Properties pProperties, Supplier<BlockEntityType<? extends EnchantedChestBlockEntity>> supplier) {
 		super(pProperties, supplier);
 		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, Boolean.valueOf(false)));
+	}
+
+	@Override
+	protected MapCodec<? extends AbstractChestBlock<EnchantedChestBlockEntity>> codec() {
+		return CODEC;
 	}
 
 	public EnchantedChestBlock(Properties properties) {
@@ -193,7 +202,7 @@ public class EnchantedChestBlock extends AbstractChestBlock<EnchantedChestBlockE
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
 		ItemStack originalStack = new ItemStack(Blocks.CHEST);
 		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity && blockEntity.getEnchantmentsTag() != null) {
 			originalStack.getOrCreateTag().put("Enchantments", blockEntity.getEnchantmentsTag());

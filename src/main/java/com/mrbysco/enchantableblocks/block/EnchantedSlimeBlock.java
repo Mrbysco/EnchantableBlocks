@@ -69,7 +69,7 @@
 //	}
 //
 //	@Override
-//	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+//	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
 //		ItemStack furnaceStack = new ItemStack(Blocks.SLIME_BLOCK);
 //		if (level.getBlockEntity(pos) instanceof AbstractEnchantedFurnaceBlockEntity blockEntity) {
 //			furnaceStack.getOrCreateTag().put("Enchantments", blockEntity.getEnchantmentsTag());

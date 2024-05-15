@@ -56,7 +56,7 @@ public class EnchantedCampfireBlockEntity extends CampfireBlockEntity implements
 				if (blockEntity.cookingProgress[i] >= blockEntity.cookingTime[i]) {
 					Container container = new SimpleContainer(inputStack);
 					ItemStack resultStack = blockEntity.quickCheck.getRecipeFor(container, level).map((recipe) -> {
-						return recipe.assemble(container, level.registryAccess());
+						return recipe.value().assemble(container, level.registryAccess());
 					}).orElse(inputStack);
 					if (resultStack.isItemEnabled(level.enabledFeatures())) {
 						Containers.dropItemStack(level, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), resultStack);

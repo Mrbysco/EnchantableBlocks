@@ -26,7 +26,15 @@
               "source": "block_entity"
             },
             {
-              "function": "enchantableblocks:copy_enchantments"
+              "function": "minecraft:copy_nbt",
+              "ops": [
+                {
+                  "op": "replace",
+                  "source": "Enchantments",
+                  "target": "Enchantments"
+                }
+              ],
+              "source": "block_entity"
             }
           ],
           "name": "minecraft:magenta_bed"

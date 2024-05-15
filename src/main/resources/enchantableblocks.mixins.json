@@ -3,7 +3,6 @@
   "minVersion": "0.8.5",
   "compatibilityLevel": "JAVA_17",
   "package": "com.mrbysco.enchantableblocks.mixin",
-  "refmap": "enchantableblocks.refmap.json",
   "target": "@env(DEFAULT)",
   "mixins": [
     "AbstractFurnaceBlockEntityAccessor",
@@ -15,8 +14,5 @@
     "EnchantmentMenuAccessor",
     "HopperBlockEntityAccessor",
     "ItemMixin"
-  ],
-  "client": [
-    "RenderBuffersAccessor"
   ]
 }

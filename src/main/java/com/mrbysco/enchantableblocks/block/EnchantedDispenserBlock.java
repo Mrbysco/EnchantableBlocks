@@ -1,9 +1,11 @@
 package com.mrbysco.enchantableblocks.block;
 
+import com.mrbysco.enchantableblocks.EnchantableBlocks;
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedDispenserBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
+import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.BlockSourceImpl;
+import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.ItemTags;
@@ -16,6 +18,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -39,24 +42,27 @@ public class EnchantedDispenserBlock extends DispenserBlock {
 	}
 
 	@Override
-	protected void dispenseFrom(ServerLevel serverLevel, BlockPos pos) {
-		BlockSourceImpl blocksourceimpl = new BlockSourceImpl(serverLevel, pos);
-		EnchantedDispenserBlockEntity dispenserBlockEntity = blocksourceimpl.getEntity();
-		int i = dispenserBlockEntity.getRandomSlot(serverLevel.random);
-		if (i < 0) {
-			serverLevel.levelEvent(1001, pos, 0);
-			serverLevel.gameEvent(GameEvent.BLOCK_ACTIVATE, pos, GameEvent.Context.of(dispenserBlockEntity.getBlockState()));
+	protected void dispenseFrom(ServerLevel serverLevel, BlockState state, BlockPos pos) {
+		EnchantedDispenserBlockEntity dispenserblockentity = serverLevel.getBlockEntity(pos, ModRegistry.ENCHANTED_DISPENSER_BLOCK_ENTITY.get()).orElse(null);
+		if (dispenserblockentity == null) {
+			EnchantableBlocks.LOGGER.warn("Ignoring dispensing attempt for Enchanted Dispenser without matching block entity at {}", pos);
 		} else {
-			ItemStack itemstack = dispenserBlockEntity.getItem(i);
-			DispenseItemBehavior dispenseitembehavior = this.getDispenseMethod(itemstack);
-			if (dispenseitembehavior != DispenseItemBehavior.NOOP) {
-				if (dispenserBlockEntity.hasEnchantment(Enchantments.INFINITY_ARROWS) && itemstack.is(ItemTags.ARROWS)) {
-					dispenseitembehavior.dispense(blocksourceimpl, itemstack);
-				} else {
-					dispenserBlockEntity.setItem(i, dispenseitembehavior.dispense(blocksourceimpl, itemstack));
+			BlockSource blocksource = new BlockSource(serverLevel, pos, state, dispenserblockentity);
+			int i = dispenserblockentity.getRandomSlot(serverLevel.random);
+			if (i < 0) {
+				serverLevel.levelEvent(1001, pos, 0);
+				serverLevel.gameEvent(GameEvent.BLOCK_ACTIVATE, pos, GameEvent.Context.of(dispenserblockentity.getBlockState()));
+			} else {
+				ItemStack itemstack = dispenserblockentity.getItem(i);
+				DispenseItemBehavior dispenseitembehavior = this.getDispenseMethod(itemstack);
+				if (dispenseitembehavior != DispenseItemBehavior.NOOP) {
+					if (dispenserblockentity.hasEnchantment(Enchantments.INFINITY_ARROWS) && itemstack.is(ItemTags.ARROWS)) {
+						dispenseitembehavior.dispense(blocksource, itemstack);
+					} else {
+						dispenserblockentity.setItem(i, dispenseitembehavior.dispense(blocksource, itemstack));
+					}
 				}
 			}
-
 		}
 	}
 
@@ -66,7 +72,7 @@ public class EnchantedDispenserBlock extends DispenserBlock {
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
 		ItemStack originalStack = new ItemStack(Blocks.DISPENSER);
 		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity && blockEntity.getEnchantmentsTag() != null) {
 			originalStack.getOrCreateTag().put("Enchantments", blockEntity.getEnchantmentsTag());

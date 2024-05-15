@@ -16,6 +16,7 @@ import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.EnchantmentTableBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.List;
 
@@ -61,7 +62,7 @@ public class EnchantedEnchantmentMenu extends EnchantmentMenu {
 						if (this.costs[k] < k + 1) {
 							this.costs[k] = 0;
 						}
-						this.costs[k] = net.minecraftforge.event.ForgeEventFactory.onEnchantmentLevelSet(level, pos, k, (int) j, itemstack, costs[k]);
+						this.costs[k] = EventHooks.onEnchantmentLevelSet(level, pos, k, (int) j, itemstack, costs[k]);
 					}
 
 					for (int l = 0; l < 3; ++l) {

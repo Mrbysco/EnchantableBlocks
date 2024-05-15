@@ -22,7 +22,7 @@ import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -34,9 +34,9 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -71,7 +71,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 			} else {
 				boolean preservation = blockEntity.hasEnchantment(ModEnchantments.PRESERVATION.get());
 				if (preservation) {
-					Recipe<?> recipe = hasInput ? quickCheck.getRecipeFor(blockEntity, level).orElse(null) : null;
+					RecipeHolder<?> recipe = hasInput ? quickCheck.getRecipeFor(blockEntity, level).orElse(null) : null;
 					if (recipe != null)
 						blockEntity.litTime -= speed;
 
@@ -84,7 +84,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		ItemStack fuel = blockEntity.items.get(1);
 		boolean hasFuel = !fuel.isEmpty();
 		if (blockEntity.isLit() || ((solar && solarRequirements) || hasFuel) && hasInput) {
-			Recipe<?> recipe = hasInput ? quickCheck.getRecipeFor(blockEntity, level).orElse(null) : null;
+			RecipeHolder<?> recipe = hasInput ? quickCheck.getRecipeFor(blockEntity, level).orElse(null) : null;
 			int i = blockEntity.getMaxStackSize();
 			if (!blockEntity.isLit()) {
 				if (solar && solarRequirements) {
@@ -148,10 +148,10 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 	}
 
 	@SuppressWarnings("unchecked")
-	private boolean enchantedBurn(RegistryAccess pRegistryAccess, @Nullable Recipe<?> pRecipe, NonNullList<ItemStack> inventory, int pMaxStackSize) {
-		if (pRecipe != null && ((AbstractFurnaceBlockEntityAccessor) this).invokeCanBurn(pRegistryAccess, pRecipe, inventory, pMaxStackSize)) {
+	private boolean enchantedBurn(RegistryAccess registryAccess, @Nullable RecipeHolder<?> recipeHolder, NonNullList<ItemStack> inventory, int maxStackSize) {
+		if (recipeHolder != null && ((AbstractFurnaceBlockEntityAccessor) this).invokeCanBurn(registryAccess, recipeHolder, inventory, maxStackSize)) {
 			ItemStack inputStack = inventory.get(0);
-			ItemStack craftedStack = ((Recipe<WorldlyContainer>) pRecipe).assemble(this, pRegistryAccess);
+			ItemStack craftedStack = ((RecipeHolder<net.minecraft.world.item.crafting.Recipe<WorldlyContainer>>) recipeHolder).value().assemble(this, registryAccess);
 			if (hasEnchantment(ModEnchantments.YIELD.get()) && craftedStack.getCount() < craftedStack.getMaxStackSize()) {
 				int enchantmentLevel = getEnchantmentLevel(ModEnchantments.YIELD.get());
 				//Adjust the craftedStack based on the level of the enchantment
@@ -167,7 +167,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 				if (this.level.isLoaded(leftPos)) {
 					BlockEntity blockEntity = this.level.getBlockEntity(leftPos);
 					if (blockEntity != null) {
-						IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getCounterClockWise()).orElse(null);
+						IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, leftPos, direction.getCounterClockWise());
 						if (itemHandler != null) {
 							resultStack = ItemHandlerHelper.insertItem(itemHandler, craftedStack, false);
 						}
@@ -176,7 +176,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 				if (this.level.isLoaded(rightPos)) {
 					BlockEntity blockEntity = this.level.getBlockEntity(rightPos);
 					if (blockEntity != null) {
-						IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getClockWise()).orElse(null);
+						IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, rightPos, direction.getClockWise());
 						if (itemHandler != null) {
 							resultStack = ItemHandlerHelper.insertItem(itemHandler, craftedStack, false);
 						}
@@ -203,7 +203,8 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 
 	private static int getTotalCookTime(Level level, AbstractEnchantedFurnaceBlockEntity blockEntity) {
 		AbstractFurnaceBlockEntityAccessor blockEntityAccessor = (AbstractFurnaceBlockEntityAccessor) blockEntity;
-		int cookTime = blockEntityAccessor.getQuickCheck().getRecipeFor(blockEntity, level).map(AbstractCookingRecipe::getCookingTime).orElse(200);
+		int cookTime = blockEntityAccessor.getQuickCheck().getRecipeFor(blockEntity, level)
+				.map(recipeHolder -> recipeHolder.value().getCookingTime()).orElse(200);
 		if (blockEntity.hasEnchantment(ModEnchantments.SPEED.get())) {
 			int enchantmentLevel = blockEntity.getEnchantmentLevel(ModEnchantments.SPEED.get());
 			//Adjust the cookTime based on the level of the enchantment

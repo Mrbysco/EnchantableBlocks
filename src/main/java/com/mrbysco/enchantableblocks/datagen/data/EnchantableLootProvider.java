@@ -1,6 +1,5 @@
 package com.mrbysco.enchantableblocks.datagen.data;
 
-import com.mrbysco.enchantableblocks.lootfunctions.CopyEnchantmentsFunction;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.data.PackOutput;
@@ -24,7 +23,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -88,6 +86,7 @@ public class EnchantableLootProvider extends LootTableProvider {
 									.copy("Bees", "BlockEntityTag.Bees"))
 							.apply(CopyBlockState.copyState(block).copy(BeehiveBlock.HONEY_LEVEL))
 							.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
+							.apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Enchantments", "Enchantments"))
 							.otherwise(LootItem.lootTableItem(originalBlock))));
 		}
 
@@ -98,7 +97,7 @@ public class EnchantableLootProvider extends LootTableProvider {
 									.setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BedBlock.PART, BedPart.HEAD))
 							)
 							.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
-							.apply(CopyEnchantmentsFunction.copyName())
+							.apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Enchantments", "Enchantments"))
 					)
 			));
 		}
@@ -108,7 +107,7 @@ public class EnchantableLootProvider extends LootTableProvider {
 					.withPool(this.applyExplosionCondition(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F))
 									.add(LootItem.lootTableItem(originalBlock)
 											.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
-											.apply(CopyEnchantmentsFunction.copyName())
+											.apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Enchantments", "Enchantments"))
 									)
 							)
 					);
@@ -116,7 +115,7 @@ public class EnchantableLootProvider extends LootTableProvider {
 
 		@Override
 		protected Iterable<Block> getKnownBlocks() {
-			return ModRegistry.BLOCKS.getEntries().stream().map(RegistryObject::get)::iterator;
+			return ModRegistry.BLOCKS.getEntries().stream().map((holder) -> (Block) holder.value())::iterator;
 		}
 	}
 

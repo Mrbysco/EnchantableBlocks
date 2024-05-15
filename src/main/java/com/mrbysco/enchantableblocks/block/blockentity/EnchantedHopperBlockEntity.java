@@ -35,9 +35,9 @@ import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.joml.Math;
 
 import javax.annotation.Nullable;
@@ -91,8 +91,8 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 	public static boolean suckInItems(Level level, EnchantedHopperBlockEntity hopper, int count) {
 		Container container = getSourceContainer(level, hopper);
 		BlockEntity blockEntity = level.getBlockEntity(hopper.getBlockPos().relative(Direction.UP));
-		if (blockEntity != null && blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.DOWN).isPresent()) {
-			IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.DOWN).orElse(null);
+		if (blockEntity != null) {
+			IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, hopper.getBlockPos().relative(Direction.UP), Direction.DOWN);
 			if (itemHandler != null) {
 				for (int i = 0; i < itemHandler.getSlots(); i++) {
 					ItemStack slotStack = itemHandler.getStackInSlot(i);
@@ -252,8 +252,8 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 		}
 		Direction direction = state.getValue(HopperBlock.FACING);
 		BlockEntity blockEntity = level.getBlockEntity(pos.relative(direction));
-		if (blockEntity != null && blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction).isPresent()) {
-			IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction).orElse(null);
+		IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, pos.relative(direction), direction);
+		if (blockEntity != null && itemHandler != null) {
 			if (!isFull(itemHandler)) {
 				for (int i = 0; i < sourceContainer.getContainerSize(); ++i) {
 					if (!sourceContainer.getItem(i).isEmpty()) {

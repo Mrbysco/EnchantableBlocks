@@ -1,10 +1,10 @@
 package com.mrbysco.enchantableblocks.mixin;
 
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedDispenserBlockEntity;
-import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
+import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -30,13 +30,13 @@ public abstract class AbstractProjectileDispenseBehaviorMixin extends DefaultDis
 	@Shadow
 	protected abstract float getUncertainty();
 
-	@Inject(method = "execute(Lnet/minecraft/core/BlockSource;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;",
+	@Inject(method = "execute(Lnet/minecraft/core/dispenser/BlockSource;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;",
 			at = @At("HEAD"), cancellable = true)
 	public void enchantableblocks$execute(BlockSource source, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
-		if (stack.is(ItemTags.ARROWS) && source.getEntity() instanceof EnchantedDispenserBlockEntity enchantedDispenserBlock) {
-			Level level = source.getLevel();
+		if (stack.is(ItemTags.ARROWS) && source.blockEntity() instanceof EnchantedDispenserBlockEntity enchantedDispenserBlock) {
+			Level level = source.level();
 			Position position = DispenserBlock.getDispensePosition(source);
-			Direction direction = source.getBlockState().getValue(DispenserBlock.FACING);
+			Direction direction = source.state().getValue(DispenserBlock.FACING);
 			Projectile projectile = this.getProjectile(level, position, stack);
 			if (projectile instanceof AbstractArrow abstractArrow) {
 				if (enchantedDispenserBlock.hasEnchantment(Enchantments.POWER_ARROWS)) {

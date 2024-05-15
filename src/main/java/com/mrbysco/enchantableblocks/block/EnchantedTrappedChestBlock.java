@@ -1,5 +1,6 @@
 package com.mrbysco.enchantableblocks.block;
 
+import com.mojang.serialization.MapCodec;
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedChestBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedTrappedChestBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
@@ -18,6 +19,8 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.AbstractChestBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,9 +30,15 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import java.util.List;
 
 public class EnchantedTrappedChestBlock extends EnchantedChestBlock {
+	public static final MapCodec<EnchantedChestBlock> CODEC = simpleCodec(p_304364_ -> new EnchantedChestBlock(p_304364_, ModRegistry.ENCHANTED_TRAPPED_CHEST_BLOCK_ENTITY::get));
 
 	public EnchantedTrappedChestBlock(Properties properties) {
 		super(properties, ModRegistry.ENCHANTED_TRAPPED_CHEST_BLOCK_ENTITY::get);
+	}
+
+	@Override
+	protected MapCodec<? extends AbstractChestBlock<EnchantedChestBlockEntity>> codec() {
+		return CODEC;
 	}
 
 	@Override
@@ -48,7 +57,7 @@ public class EnchantedTrappedChestBlock extends EnchantedChestBlock {
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
 		ItemStack originalStack = new ItemStack(Blocks.TRAPPED_CHEST);
 		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity && blockEntity.getEnchantmentsTag() != null) {
 			originalStack.getOrCreateTag().put("Enchantments", blockEntity.getEnchantmentsTag());

@@ -5,7 +5,6 @@ import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.util.MiscHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -18,6 +17,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CraftingTableBlock;
 import net.minecraft.world.level.block.EntityBlock;
@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
+import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -49,7 +49,7 @@ public class EnchantedCraftingTableBlock extends CraftingTableBlock implements E
 		} else {
 			BlockEntity blockEntity = level.getBlockEntity(pos);
 			if (blockEntity instanceof EnchantedCraftingTableBlockEntity) {
-				NetworkHooks.openScreen((ServerPlayer) player, (EnchantedCraftingTableBlockEntity) blockEntity, pos);
+				player.openMenu((EnchantedCraftingTableBlockEntity) blockEntity, pos);
 				player.awardStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
 			}
 
@@ -61,9 +61,9 @@ public class EnchantedCraftingTableBlock extends CraftingTableBlock implements E
 	public Item asItem() {
 		return Items.CRAFTING_TABLE;
 	}
-
+	
 	@Override
-	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
 		ItemStack originalStack = new ItemStack(Blocks.CRAFTING_TABLE);
 		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity && blockEntity.getEnchantmentsTag() != null) {
 			originalStack.getOrCreateTag().put("Enchantments", blockEntity.getEnchantmentsTag());
