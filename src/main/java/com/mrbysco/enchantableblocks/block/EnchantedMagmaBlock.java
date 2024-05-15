@@ -61,7 +61,7 @@ public class EnchantedMagmaBlock extends MagmaBlock implements EntityBlock {
 	@Override
 	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
 		ItemStack originalStack = new ItemStack(Blocks.MAGMA_BLOCK);
-		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity) {
+		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity && blockEntity.getEnchantmentsTag() != null) {
 			originalStack.getOrCreateTag().put("Enchantments", blockEntity.getEnchantmentsTag());
 		}
 		return originalStack;

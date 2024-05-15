@@ -95,7 +95,7 @@ public class EnchantedBlastFurnaceBlock extends BlastFurnaceBlock {
 	@Override
 	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
 		ItemStack originalStack = new ItemStack(Blocks.BLAST_FURNACE);
-		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity) {
+		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity && blockEntity.getEnchantmentsTag() != null) {
 			originalStack.getOrCreateTag().put("Enchantments", blockEntity.getEnchantmentsTag());
 		}
 		return originalStack;

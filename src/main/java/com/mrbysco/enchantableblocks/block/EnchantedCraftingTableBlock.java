@@ -65,7 +65,7 @@ public class EnchantedCraftingTableBlock extends CraftingTableBlock implements E
 	@Override
 	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
 		ItemStack originalStack = new ItemStack(Blocks.CRAFTING_TABLE);
-		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity) {
+		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity && blockEntity.getEnchantmentsTag() != null) {
 			originalStack.getOrCreateTag().put("Enchantments", blockEntity.getEnchantmentsTag());
 		}
 		return originalStack;
