@@ -59,8 +59,8 @@ public class EnchantableBlocks {
 		ReplacementUtil.addReplacement(Blocks.SMOKER, ModRegistry.ENCHANTED_SMOKER, ModTags.SMOKER_APPLICABLE);
 		ReplacementUtil.addReplacement(Blocks.BEACON, ModRegistry.ENCHANTED_BEACON, ModTags.BEACON_APPLICABLE);
 		ReplacementUtil.addReplacement(Blocks.CAMPFIRE, ModRegistry.ENCHANTED_CAMPFIRE, ModTags.CAMPFIRE_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.SOUL_CAMPFIRE, ModRegistry.ENCHANTED_MAGMA_BLOCK, ModTags.SOUL_CAMPFIRE_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.MAGMA_BLOCK, ModRegistry.ENCHANTED_BEACON, ModTags.MAGMA_BLOCK_APPLICABLE);
+		ReplacementUtil.addReplacement(Blocks.SOUL_CAMPFIRE, ModRegistry.ENCHANTED_SOUL_CAMPFIRE, ModTags.SOUL_CAMPFIRE_APPLICABLE);
+		ReplacementUtil.addReplacement(Blocks.MAGMA_BLOCK, ModRegistry.ENCHANTED_MAGMA_BLOCK, ModTags.MAGMA_BLOCK_APPLICABLE);
 		ReplacementUtil.addReplacement(Blocks.DISPENSER, ModRegistry.ENCHANTED_DISPENSER, ModTags.DISPENSER_APPLICABLE);
 		ReplacementUtil.addReplacement(Blocks.RESPAWN_ANCHOR, ModRegistry.ENCHANTED_RESPAWN_ANCHOR, ModTags.RESPAWN_ANCHOR_APPLICABLE);
 		ReplacementUtil.addReplacement(Blocks.HOPPER, ModRegistry.ENCHANTED_HOPPER, ModTags.HOPPER_APPLICABLE);
