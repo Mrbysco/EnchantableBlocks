@@ -48,7 +48,7 @@ public class CopyEnchantmentsFunction extends LootItemConditionalFunction {
 		return stack;
 	}
 
-	public static LootItemConditionalFunction.Builder<?> copyName() {
+	public static LootItemConditionalFunction.Builder<?> copyEnchantments() {
 		return simpleBuilder(CopyEnchantmentsFunction::new);
 	}
 

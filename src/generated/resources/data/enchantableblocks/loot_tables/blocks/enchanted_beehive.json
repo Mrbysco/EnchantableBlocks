@@ -46,6 +46,9 @@
                 {
                   "function": "minecraft:copy_name",
                   "source": "block_entity"
+                },
+                {
+                  "function": "enchantableblocks:copy_enchantments"
                 }
               ],
               "name": "minecraft:beehive"

@@ -1,6 +1,6 @@
-// 1.20.1	2024-04-13T19:28:58.0268965	Loot Tables
+// 1.20.1	2024-05-15T21:44:57.3421839	Loot Tables
 6253905240608df81e5499291f0b8792d6df299d data/enchantableblocks/loot_tables/blocks/enchanted_beacon.json
-77fa343414846bc08550f036c8d6cfe454adb659 data/enchantableblocks/loot_tables/blocks/enchanted_beehive.json
+76dbcd7ff4dd73c135a5be213c07cb3c2824ec20 data/enchantableblocks/loot_tables/blocks/enchanted_beehive.json
 55ce3507e7c718a59400a92ba9e9975637f5320a data/enchantableblocks/loot_tables/blocks/enchanted_black_bed.json
 8d100136ce8d10f11a2453f9692b0ab5c8037978 data/enchantableblocks/loot_tables/blocks/enchanted_blast_furnace.json
 39c388f9e13b659acebdd9ea1539094d402baccf data/enchantableblocks/loot_tables/blocks/enchanted_blue_bed.json

@@ -88,6 +88,7 @@ public class EnchantableLootProvider extends LootTableProvider {
 									.copy("Bees", "BlockEntityTag.Bees"))
 							.apply(CopyBlockState.copyState(block).copy(BeehiveBlock.HONEY_LEVEL))
 							.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
+							.apply(CopyEnchantmentsFunction.copyEnchantments())
 							.otherwise(LootItem.lootTableItem(originalBlock))));
 		}
 
@@ -98,7 +99,7 @@ public class EnchantableLootProvider extends LootTableProvider {
 									.setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BedBlock.PART, BedPart.HEAD))
 							)
 							.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
-							.apply(CopyEnchantmentsFunction.copyName())
+							.apply(CopyEnchantmentsFunction.copyEnchantments())
 					)
 			));
 		}
@@ -108,7 +109,7 @@ public class EnchantableLootProvider extends LootTableProvider {
 					.withPool(this.applyExplosionCondition(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F))
 									.add(LootItem.lootTableItem(originalBlock)
 											.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
-											.apply(CopyEnchantmentsFunction.copyName())
+											.apply(CopyEnchantmentsFunction.copyEnchantments())
 									)
 							)
 					);
