@@ -21,6 +21,7 @@ import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
@@ -54,7 +55,7 @@ public class EnchantedBedBlock extends BedBlock {
 	@Override
 	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
 		ItemStack originalStack = new ItemStack(originalBlock.get());
-		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity) {
+		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity && blockEntity.getEnchantmentsTag() != null) {
 			originalStack.getOrCreateTag().put("Enchantments", blockEntity.getEnchantmentsTag());
 		}
 		return originalStack;
@@ -144,7 +145,13 @@ public class EnchantedBedBlock extends BedBlock {
 	public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		super.setPlacedBy(level, pos, state, placer, stack);
 		BlockEntity blockentity = level.getBlockEntity(pos);
-		if (blockentity instanceof IEnchantable enchantable) {
+		if (!level.isClientSide && blockentity instanceof IEnchantable enchantable) {
+			enchantable.setEnchantments(stack.getEnchantmentTags());
+		}
+
+		BlockPos blockpos = pos.relative(state.getValue(FACING));
+		BlockEntity blockentity2 = level.getBlockEntity(blockpos);
+		if (!level.isClientSide && blockentity2 instanceof IEnchantable enchantable) {
 			enchantable.setEnchantments(stack.getEnchantmentTags());
 		}
 	}
