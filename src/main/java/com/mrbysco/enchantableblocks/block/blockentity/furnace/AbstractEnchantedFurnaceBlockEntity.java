@@ -217,7 +217,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		if (burnDuration != 0 && this.hasEnchantment(ModEnchantments.FUEL_EFFICIENCY.get())) {
 			int enchantmentLevel = this.getEnchantmentLevel(ModEnchantments.FUEL_EFFICIENCY.get());
 			//Adjust the burnDuration based on the level of the enchantment
-			burnDuration = Mth.ceil(1 + (enchantmentLevel * 0.2));
+			burnDuration = Mth.ceil(burnDuration * (1F + (enchantmentLevel * 0.2F)));
 		}
 		return burnDuration;
 	}
