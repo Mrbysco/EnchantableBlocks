@@ -2,7 +2,6 @@ package com.mrbysco.enchantableblocks.compat.top;
 
 import com.mrbysco.enchantableblocks.EnchantableBlocks;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
-import mcjty.theoneprobe.api.ElementAlignment;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoProvider;
@@ -41,8 +40,7 @@ public class TOPCompat {
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level level, BlockState state, IProbeHitData data) {
 			BlockEntity blockEntity = level.getBlockEntity(data.getPos());
 			if (blockEntity instanceof IEnchantable enchantable) {
-				var info = probeInfo.horizontal(probeInfo.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER));
-				enchantable.getEnchantments().forEach((enchantment, integer) -> info.text(enchantment.getFullname(integer)));
+				enchantable.getEnchantments().forEach((enchantment, integer) -> probeInfo.mcText(enchantment.getFullname(integer)));
 			}
 		}
 	}
