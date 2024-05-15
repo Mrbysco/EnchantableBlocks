@@ -2,7 +2,6 @@ package com.mrbysco.enchantableblocks.block.blockentity;
 
 import com.google.common.collect.Lists;
 import com.mrbysco.enchantableblocks.mixin.BeaconBeamSectionAccessor;
-import com.mrbysco.enchantableblocks.mixin.BeaconBlockEntityAccessor;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import com.mrbysco.enchantableblocks.util.TagHelper;
@@ -17,6 +16,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -98,7 +98,7 @@ public class EnchantedBeaconBlockEntity extends BeaconBlockEntity implements IEn
 		int levels = blockEntity.levels;
 		if (level.getGameTime() % 80L == 0L) {
 			if (!blockEntity.beamSections.isEmpty()) {
-				blockEntity.levels = BeaconBlockEntityAccessor.invokeUpdateBase(level, xPos, yPos, zPos);
+				blockEntity.levels = updateBase(level, xPos, yPos, zPos);
 			}
 
 			if (blockEntity.levels > 0 && !blockEntity.beamSections.isEmpty()) {
@@ -124,6 +124,34 @@ public class EnchantedBeaconBlockEntity extends BeaconBlockEntity implements IEn
 				}
 			}
 		}
+	}
+
+	private static int updateBase(Level pLevel, int pX, int pY, int pZ) {
+		int i = 0;
+
+		for(int j = 1; j <= 4; i = j++) {
+			int k = pY - j;
+			if (k < pLevel.getMinBuildHeight()) {
+				break;
+			}
+
+			boolean flag = true;
+
+			for(int l = pX - j; l <= pX + j && flag; ++l) {
+				for(int i1 = pZ - j; i1 <= pZ + j; ++i1) {
+					if (!pLevel.getBlockState(new BlockPos(l, k, i1)).is(BlockTags.BEACON_BASE_BLOCKS)) {
+						flag = false;
+						break;
+					}
+				}
+			}
+
+			if (!flag) {
+				break;
+			}
+		}
+
+		return i;
 	}
 
 	private static void applyEffects(EnchantedBeaconBlockEntity blockEntity, Level level, BlockPos pos, int levels, @Nullable MobEffect primary, @Nullable MobEffect secondary) {

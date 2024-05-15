@@ -9,7 +9,6 @@
     "AbstractFurnaceBlockEntityAccessor",
     "AbstractProjectileDispenseBehaviorMixin",
     "BeaconBeamSectionAccessor",
-    "BeaconBlockEntityAccessor",
     "BeehiveBlockEntityAccessor",
     "BlockItemMixin",
     "ConduitBlockEntityAccessor",
