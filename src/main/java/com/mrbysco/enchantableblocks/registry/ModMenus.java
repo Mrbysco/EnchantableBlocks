@@ -1,6 +1,7 @@
 package com.mrbysco.enchantableblocks.registry;
 
 import com.mrbysco.enchantableblocks.EnchantableBlocks;
+import com.mrbysco.enchantableblocks.menu.EnchantedBeaconMenu;
 import com.mrbysco.enchantableblocks.menu.EnchantedEnchantmentMenu;
 import com.mrbysco.enchantableblocks.menu.crafting.EnchantedCraftingMenu;
 import net.minecraft.world.Container;
@@ -19,6 +20,8 @@ public class ModMenus {
 			IForgeMenuType.create((windowId, inv, data) -> new EnchantedEnchantmentMenu(windowId, inv)));
 	public static final RegistryObject<MenuType<EnchantedCraftingMenu>> ENCHANTED_CRAFTING = MENU_TYPES.register("enchanted_crafting", () ->
 			IForgeMenuType.create(EnchantedCraftingMenu::new));
+	public static final RegistryObject<MenuType<EnchantedBeaconMenu>> ENCHANTED_BEACON = MENU_TYPES.register("enchanted_beacon", () ->
+			IForgeMenuType.create((windowId, inv, data) -> new EnchantedBeaconMenu(windowId, inv)));
 
 	public static ChestMenu fourRows(int pContainerId, Inventory pPlayerInventory, Container pContainer) {
 		return new ChestMenu(MenuType.GENERIC_9x4, pContainerId, pPlayerInventory, pContainer, 4);

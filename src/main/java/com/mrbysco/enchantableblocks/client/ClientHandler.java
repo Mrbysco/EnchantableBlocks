@@ -14,6 +14,7 @@ import com.mrbysco.enchantableblocks.registry.ModMenus;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.inventory.BeaconScreen;
 import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -27,6 +28,7 @@ public class ClientHandler {
 	public static void onClientSetup(final FMLClientSetupEvent event) {
 		MenuScreens.register(ModMenus.ENCHANTED_ENCHANTMENT.get(), EnchantmentScreen::new);
 		MenuScreens.register(ModMenus.ENCHANTED_CRAFTING.get(), EnchantedCraftingScreen::new);
+		MenuScreens.register(ModMenus.ENCHANTED_BEACON.get(), BeaconScreen::new);
 
 		ItemBlockRenderTypes.setRenderLayer(ModRegistry.ENCHANTED_CAMPFIRE.get(), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(ModRegistry.ENCHANTED_SOUL_CAMPFIRE.get(), RenderType.cutout());

@@ -1,6 +1,7 @@
 package com.mrbysco.enchantableblocks.block.blockentity;
 
 import com.google.common.collect.Lists;
+import com.mrbysco.enchantableblocks.menu.EnchantedBeaconMenu;
 import com.mrbysco.enchantableblocks.mixin.BeaconBeamSectionAccessor;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
@@ -20,11 +21,15 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -185,6 +190,13 @@ public class EnchantedBeaconBlockEntity extends BeaconBlockEntity implements IEn
 			}
 
 		}
+	}
+
+	@Override
+	@Nullable
+	public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
+		return BaseContainerBlockEntity.canUnlock(player, this.lockKey, this.getDisplayName()) ?
+				new EnchantedBeaconMenu(containerId, inventory, this.dataAccess, ContainerLevelAccess.create(this.level, this.getBlockPos())) : null;
 	}
 
 	@Override
