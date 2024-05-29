@@ -3,6 +3,7 @@ package com.mrbysco.enchantableblocks.block.blockentity.furnace;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.mixin.AbstractFurnaceBlockEntityAccessor;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
+import com.mrbysco.enchantableblocks.registry.ModTags;
 import com.mrbysco.enchantableblocks.util.TagHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -152,7 +153,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		if (pRecipe != null && ((AbstractFurnaceBlockEntityAccessor) this).invokeCanBurn(pRegistryAccess, pRecipe, inventory, pMaxStackSize)) {
 			ItemStack inputStack = inventory.get(0);
 			ItemStack craftedStack = ((Recipe<WorldlyContainer>) pRecipe).assemble(this, pRegistryAccess);
-			if (hasEnchantment(ModEnchantments.YIELD.get()) && craftedStack.getCount() < craftedStack.getMaxStackSize()) {
+			if (hasEnchantment(ModEnchantments.YIELD.get()) && craftedStack.getCount() < craftedStack.getMaxStackSize() && !craftedStack.is(ModTags.Items.YIELD_BLACKLIST)) {
 				int enchantmentLevel = getEnchantmentLevel(ModEnchantments.YIELD.get());
 				//Adjust the craftedStack based on the level of the enchantment
 				int count = 1 + enchantmentLevel;

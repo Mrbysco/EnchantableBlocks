@@ -4,10 +4,12 @@ import com.mrbysco.enchantableblocks.datagen.assets.EnchantableBlockstateProvide
 import com.mrbysco.enchantableblocks.datagen.assets.EnchantableLanguageProvider;
 import com.mrbysco.enchantableblocks.datagen.data.EnchantableBlockTagsProvider;
 import com.mrbysco.enchantableblocks.datagen.data.EnchantableEnchantmentTagsProvider;
+import com.mrbysco.enchantableblocks.datagen.data.EnchantableItemTagsProvider;
 import com.mrbysco.enchantableblocks.datagen.data.EnchantableLootProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
+import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,7 +28,9 @@ public class EnchantableDatagen {
 
 		if (event.includeServer()) {
 			generator.addProvider(true, new EnchantableLootProvider(packOutput));
-			generator.addProvider(true, new EnchantableBlockTagsProvider(packOutput, lookupProvider, existingFileHelper));
+			BlockTagsProvider blockTagProvider;
+			generator.addProvider(true, blockTagProvider = new EnchantableBlockTagsProvider(packOutput, lookupProvider, existingFileHelper));
+			generator.addProvider(true, new EnchantableItemTagsProvider(packOutput, lookupProvider, blockTagProvider.contentsGetter(), existingFileHelper));
 		}
 		if (event.includeClient()) {
 			generator.addProvider(true, new EnchantableLanguageProvider(packOutput));

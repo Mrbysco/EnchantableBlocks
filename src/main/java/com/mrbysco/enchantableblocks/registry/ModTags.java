@@ -4,6 +4,7 @@ import com.mrbysco.enchantableblocks.EnchantableBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 public class ModTags {
@@ -44,6 +45,11 @@ public class ModTags {
 
 	public static class General {
 		public static final TagKey<Enchantment> STORAGE_UPGRADE = modTag("storage_upgrade");
+
+	}
+
+	public static class Items {
+		public static final TagKey<Item> YIELD_BLACKLIST = TagKey.create(Registries.ITEM, new ResourceLocation(EnchantableBlocks.MOD_ID, "yield_blacklist"));
 
 	}
 
