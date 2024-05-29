@@ -1,1 +1,2 @@
-* Initial update to 1.20.4 (NeoForge)
+* Fix Enchanted Hoppers not exporting correctly
+* Add a `yield_blacklist` item tag that prevents furnace recipes from increasing the recipe yield
