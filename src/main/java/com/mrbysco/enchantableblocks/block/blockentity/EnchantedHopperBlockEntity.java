@@ -82,9 +82,7 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 			}
 			blockEntity.setCooldown(0);
 			int finalCount = count;
-			tryMoveItems(level, pos, state, blockEntity, () -> {
-				return suckInItems(level, blockEntity, finalCount);
-			});
+			tryMoveItems(level, pos, state, blockEntity, () -> suckInItems(level, blockEntity, finalCount));
 		}
 	}
 
@@ -178,9 +176,7 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 	}
 
 	private static boolean isEmptyContainer(Container pContainer, Direction pDirection) {
-		return getSlots(pContainer, pDirection).allMatch((slot) -> {
-			return pContainer.getItem(slot).isEmpty();
-		});
+		return getSlots(pContainer, pDirection).allMatch((slot) -> pContainer.getItem(slot).isEmpty());
 	}
 
 	private static boolean tryTakeInItemFromSlot(EnchantedHopperBlockEntity pHopper, Container pContainer, int slot, Direction pDirection,
@@ -252,8 +248,8 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 		}
 		Direction direction = state.getValue(HopperBlock.FACING);
 		BlockEntity blockEntity = level.getBlockEntity(pos.relative(direction));
-		if (blockEntity != null && blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction).isPresent()) {
-			IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction).orElse(null);
+		if (blockEntity != null && blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getOpposite()).isPresent()) {
+			IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getOpposite()).orElse(null);
 			if (!isFull(itemHandler)) {
 				for (int i = 0; i < sourceContainer.getContainerSize(); ++i) {
 					if (!sourceContainer.getItem(i).isEmpty()) {
@@ -275,15 +271,15 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 				if (!isFullContainer(container, direction)) {
 					for (int i = 0; i < sourceContainer.getContainerSize(); ++i) {
 						if (!sourceContainer.getItem(i).isEmpty()) {
-							ItemStack itemstack = sourceContainer.getItem(i).copy();
-							ItemStack itemstack1 = addItem(sourceContainer, container,
-									sourceContainer.removeItem(i, Math.min(count, itemstack.getCount())), direction);
-							if (itemstack1.isEmpty()) {
+							ItemStack stackCopy = sourceContainer.getItem(i).copy();
+							ItemStack addStack = addItem(sourceContainer, container,
+									sourceContainer.removeItem(i, Math.min(count, stackCopy.getCount())), direction);
+							if (addStack.isEmpty()) {
 								container.setChanged();
 								return true;
 							}
 
-							sourceContainer.setItem(i, itemstack);
+							sourceContainer.setItem(i, stackCopy);
 						}
 					}
 				}
