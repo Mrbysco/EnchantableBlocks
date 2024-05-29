@@ -24,8 +24,6 @@ import net.minecraft.world.level.block.BedBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.function.Supplier;
-
 public class ModEnchantments {
 	public static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(BuiltInRegistries.ENCHANTMENT, EnchantableBlocks.MOD_ID);
 
