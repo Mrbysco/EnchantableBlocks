@@ -280,20 +280,32 @@ public class EnchantedConduitBlockEntity extends ConduitBlockEntity implements I
 
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
-		if (packet.getTag() != null)
-			load(packet.getTag());
+		var tag = packet.getTag();
+		if (tag != null) {
+			handleUpdateTag(tag);
+
+			BlockState state = level.getBlockState(worldPosition);
+			level.sendBlockUpdated(worldPosition, state, state, 3);
+		}
+	}
+
+	@Override
+	public void onLoad() {
+		super.onLoad();
+		if (level != null) {
+			BlockState state = level.getBlockState(worldPosition);
+			level.sendBlockUpdated(worldPosition, state, state, 3);
+		}
 	}
 
 	@Override
 	public CompoundTag getUpdateTag() {
-		CompoundTag tag = new CompoundTag();
-		saveAdditional(tag);
-		return tag;
+		return saveWithoutMetadata();
 	}
 
 	@Override
 	public void handleUpdateTag(CompoundTag tag) {
-		super.handleUpdateTag(tag);
+		load(tag);
 	}
 
 	@Override
