@@ -6,7 +6,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class EnchantedTrappedChestBlockEntity extends EnchantedChestBlockEntity  {
+public class EnchantedTrappedChestBlockEntity extends EnchantedChestBlockEntity {
 	public EnchantedTrappedChestBlockEntity(BlockPos pos, BlockState state) {
 		super(ModRegistry.ENCHANTED_TRAPPED_CHEST_BLOCK_ENTITY.get(), pos, state);
 	}

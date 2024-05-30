@@ -44,9 +44,10 @@ public class EnchantedCraftingScreen extends AbstractContainerScreen<EnchantedCr
 
 	/**
 	 * Renders the graphical user interface (GUI) element.
+	 *
 	 * @param pGuiGraphics the GuiGraphics object used for rendering.
-	 * @param pMouseX the x-coordinate of the mouse cursor.
-	 * @param pMouseY the y-coordinate of the mouse cursor.
+	 * @param pMouseX      the x-coordinate of the mouse cursor.
+	 * @param pMouseY      the y-coordinate of the mouse cursor.
 	 * @param pPartialTick the partial tick time.
 	 */
 	public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
@@ -77,10 +78,11 @@ public class EnchantedCraftingScreen extends AbstractContainerScreen<EnchantedCr
 	/**
 	 * Called when a mouse button is clicked within the GUI element.
 	 * <p>
-	 * @return {@code true} if the event is consumed, {@code false} otherwise.
+	 *
 	 * @param pMouseX the X coordinate of the mouse.
 	 * @param pMouseY the Y coordinate of the mouse.
 	 * @param pButton the button that was clicked.
+	 * @return {@code true} if the event is consumed, {@code false} otherwise.
 	 */
 	public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
 		if (this.recipeBookComponent.mouseClicked(pMouseX, pMouseY, pButton)) {
@@ -92,7 +94,7 @@ public class EnchantedCraftingScreen extends AbstractContainerScreen<EnchantedCr
 	}
 
 	protected boolean hasClickedOutside(double pMouseX, double pMouseY, int pGuiLeft, int pGuiTop, int pMouseButton) {
-		boolean flag = pMouseX < (double)pGuiLeft || pMouseY < (double)pGuiTop || pMouseX >= (double)(pGuiLeft + this.imageWidth) || pMouseY >= (double)(pGuiTop + this.imageHeight);
+		boolean flag = pMouseX < (double) pGuiLeft || pMouseY < (double) pGuiTop || pMouseX >= (double) (pGuiLeft + this.imageWidth) || pMouseY >= (double) (pGuiTop + this.imageHeight);
 		return this.recipeBookComponent.hasClickedOutside(pMouseX, pMouseY, this.leftPos, this.topPos, this.imageWidth, this.imageHeight, pMouseButton) && flag;
 	}
 

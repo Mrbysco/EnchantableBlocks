@@ -35,8 +35,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +134,7 @@ public class EnchantedBeaconBlockEntity extends BeaconBlockEntity implements IEn
 	private static int updateBase(Level pLevel, int pX, int pY, int pZ) {
 		int i = 0;
 
-		for(int j = 1; j <= 4; i = j++) {
+		for (int j = 1; j <= 4; i = j++) {
 			int k = pY - j;
 			if (k < pLevel.getMinBuildHeight()) {
 				break;
@@ -142,8 +142,8 @@ public class EnchantedBeaconBlockEntity extends BeaconBlockEntity implements IEn
 
 			boolean flag = true;
 
-			for(int l = pX - j; l <= pX + j && flag; ++l) {
-				for(int i1 = pZ - j; i1 <= pZ + j; ++i1) {
+			for (int l = pX - j; l <= pX + j && flag; ++l) {
+				for (int i1 = pZ - j; i1 <= pZ + j; ++i1) {
 					if (!pLevel.getBlockState(new BlockPos(l, k, i1)).is(BlockTags.BEACON_BASE_BLOCKS)) {
 						flag = false;
 						break;
