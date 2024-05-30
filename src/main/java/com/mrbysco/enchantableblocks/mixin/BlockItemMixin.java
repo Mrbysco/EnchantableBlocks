@@ -27,7 +27,7 @@ public abstract class BlockItemMixin extends Item {
 	}
 
 	@Inject(method = "getPlacementState(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)
-	public void enchantableblocks$placeBlock(BlockPlaceContext context, CallbackInfoReturnable<BlockState> cir) {
+	public void enchantableblocks$getPlacementState(BlockPlaceContext context, CallbackInfoReturnable<BlockState> cir) {
 		if (context.getItemInHand().isEnchanted()) {
 			Block block = ReplacementUtil.getReplacement(this.getBlock());
 			if (block != null) {
