@@ -17,16 +17,19 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderBuffersEvent;
 
 public class ClientHandler {
 	public static void onClientSetup(final FMLClientSetupEvent event) {
-		MenuScreens.register(ModMenus.ENCHANTED_ENCHANTMENT.get(), EnchantmentScreen::new);
-		MenuScreens.register(ModMenus.ENCHANTED_CRAFTING.get(), EnchantedCraftingScreen::new);
-		MenuScreens.register(ModMenus.ENCHANTED_BEACON.get(), BeaconScreen::new);
-
 		ItemBlockRenderTypes.setRenderLayer(ModRegistry.ENCHANTED_CAMPFIRE.get(), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(ModRegistry.ENCHANTED_SOUL_CAMPFIRE.get(), RenderType.cutout());
+	}
+
+	public static void registerMenuScreen(final RegisterMenuScreensEvent event) {
+		event.register(ModMenus.ENCHANTED_ENCHANTMENT.get(), EnchantmentScreen::new);
+		event.register(ModMenus.ENCHANTED_CRAFTING.get(), EnchantedCraftingScreen::new);
+		event.register(ModMenus.ENCHANTED_BEACON.get(), BeaconScreen::new);
 	}
 
 	public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
