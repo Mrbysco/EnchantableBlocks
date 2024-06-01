@@ -1,1 +1,2 @@
-* Fix glintless not working on servers due to broken syncing
+* Use the proper Menu screen register event
+* Setup IMC event so mods can register their own enchanted blocks
