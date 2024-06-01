@@ -35,7 +35,11 @@ public class ReplacementUtil {
 		return false;
 	}
 
+	public static void addReplacement(BlockReplacement replacement) {
+		replacementMap.put(replacement.originalBlock(), replacement);
+	}
+
 	public static void addReplacement(Block block, Supplier<? extends Block> replacement, TagKey<Enchantment> enchantmentTag) {
-		replacementMap.put(block, new BlockReplacement(replacement, enchantmentTag));
+		replacementMap.put(block, new BlockReplacement(block, replacement, enchantmentTag));
 	}
 }
