@@ -56,7 +56,6 @@ import java.util.function.Supplier;
 
 public class ModRegistry {
 	public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(EnchantableBlocks.MOD_ID);
-	public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(EnchantableBlocks.MOD_ID);
 	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, EnchantableBlocks.MOD_ID);
 
 	public static final DeferredBlock<EnchantedFurnaceBlock> ENCHANTED_FURNACE = BLOCKS.register("enchanted_furnace", () -> new EnchantedFurnaceBlock(Block.Properties.ofFullCopy(Blocks.FURNACE)));
