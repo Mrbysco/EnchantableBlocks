@@ -1,2 +1,1 @@
-* Use the proper Menu screen register event
-* Setup IMC event so mods can register their own enchanted blocks
+* Fix Crafting tables that aren't enchanted with Preservation voiding items when closing
