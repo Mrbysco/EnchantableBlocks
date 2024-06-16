@@ -14,11 +14,11 @@ public class TagHelper {
 		Optional<ResourceKey<Enchantment>> enchantmentKey = BuiltInRegistries.ENCHANTMENT.getResourceKey(enchantment);
 		if (enchantmentKey.isEmpty()) return false;
 		Optional<Holder.Reference<Enchantment>> enchantmentHolder = BuiltInRegistries.ENCHANTMENT.getHolder(enchantmentKey.get());
-		return enchantmentHolder.filter(enchantmentReference -> matchesTag(enchantmentReference, enchantmentTag)).isPresent();
+		return enchantmentHolder.stream().anyMatch(enchantmentReference -> matchesTag(enchantmentReference, enchantmentTag));
 	}
 
 	public static boolean matchesTag(Holder<Enchantment> enchantment, TagKey<Enchantment> enchantmentTag) {
 		Optional<HolderSet.Named<Enchantment>> optionalTag = BuiltInRegistries.ENCHANTMENT.getTag(enchantmentTag);
-		return optionalTag.map(holders -> holders.contains(enchantment)).orElse(false);
+		return optionalTag.stream().anyMatch(holders -> holders.contains(enchantment));
 	}
 }
