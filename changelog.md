@@ -1,1 +1,1 @@
-* Fix Crafting tables that aren't enchanted with Preservation voiding items when closing
+* Fix hoppers enchanted with efficiency not working properly
