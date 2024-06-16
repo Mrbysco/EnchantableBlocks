@@ -1,1 +1,1 @@
-* Fix hoppers enchanted with efficiency not working properly
+* Change tag checking logic slightly
