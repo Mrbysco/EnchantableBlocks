@@ -133,7 +133,7 @@ public class EnchantedCraftingMenu extends RecipeBookMenu<CraftingContainer> {
 	 */
 	public void removed(Player player) {
 		super.removed(player);
-		if (this.craftMatrix instanceof TransientCraftingContainer) {
+		if (!(this.craftMatrix instanceof EnchantedCraftingContainer)) {
 			this.access.execute((level, pos) -> {
 				this.clearContainer(player, this.craftMatrix);
 			});
