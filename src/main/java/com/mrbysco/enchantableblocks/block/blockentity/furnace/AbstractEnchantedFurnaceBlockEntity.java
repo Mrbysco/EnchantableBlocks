@@ -170,7 +170,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 					if (blockEntity != null) {
 						IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, leftPos, direction.getCounterClockWise());
 						if (itemHandler != null) {
-							resultStack = ItemHandlerHelper.insertItem(itemHandler, craftedStack, false);
+							craftedStack = ItemHandlerHelper.insertItem(itemHandler, craftedStack, false);
 						}
 					}
 				}
@@ -179,7 +179,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 					if (blockEntity != null) {
 						IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, rightPos, direction.getClockWise());
 						if (itemHandler != null) {
-							resultStack = ItemHandlerHelper.insertItem(itemHandler, craftedStack, false);
+							craftedStack = ItemHandlerHelper.insertItem(itemHandler, craftedStack, false);
 						}
 					}
 				}
