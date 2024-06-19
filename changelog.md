@@ -1,1 +1,2 @@
-* Change tag checking logic slightly
+* Fix Preservation on Crafing Tables
+* Fix Preservation enchant on furnaces
