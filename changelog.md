@@ -1,2 +1,1 @@
-* Fix Preservation on Crafing Tables
-* Fix Preservation enchant on furnaces
+* Initial update to 1.21
