@@ -86,7 +86,7 @@ public class EnchantedChestRenderer<T extends BlockEntity & LidBlockEntity> impl
 			VertexConsumer vertexconsumer;
 			if (renderEnchantment) {
 				vertexconsumer = VertexMultiConsumer.create(
-						new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose.pose(), pose.normal(), 0.0078125F),
+						new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose, 0.0078125F),
 						material.buffer(bufferSource, RenderType::entityCutout)
 				);
 			} else {

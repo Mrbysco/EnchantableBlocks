@@ -6,7 +6,6 @@ import com.mrbysco.enchantableblocks.compat.top.TOPCompat;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModMenus;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
-import com.mrbysco.enchantableblocks.registry.ModTags;
 import com.mrbysco.enchantableblocks.util.BlockReplacement;
 import com.mrbysco.enchantableblocks.util.ReplacementUtil;
 import net.minecraft.world.level.block.Blocks;
@@ -60,38 +59,38 @@ public class EnchantableBlocks {
 	}
 
 	private void onServerStarted(ServerStartedEvent event) {
-		ReplacementUtil.addReplacement(Blocks.FURNACE, ModRegistry.ENCHANTED_FURNACE, ModTags.FURNACE_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.BLAST_FURNACE, ModRegistry.ENCHANTED_BLAST_FURNACE, ModTags.BLAST_FURNACE_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.SMOKER, ModRegistry.ENCHANTED_SMOKER, ModTags.SMOKER_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.BEACON, ModRegistry.ENCHANTED_BEACON, ModTags.BEACON_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.CAMPFIRE, ModRegistry.ENCHANTED_CAMPFIRE, ModTags.CAMPFIRE_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.SOUL_CAMPFIRE, ModRegistry.ENCHANTED_SOUL_CAMPFIRE, ModTags.SOUL_CAMPFIRE_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.MAGMA_BLOCK, ModRegistry.ENCHANTED_MAGMA_BLOCK, ModTags.MAGMA_BLOCK_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.DISPENSER, ModRegistry.ENCHANTED_DISPENSER, ModTags.DISPENSER_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.RESPAWN_ANCHOR, ModRegistry.ENCHANTED_RESPAWN_ANCHOR, ModTags.RESPAWN_ANCHOR_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.HOPPER, ModRegistry.ENCHANTED_HOPPER, ModTags.HOPPER_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.ENCHANTING_TABLE, ModRegistry.ENCHANTED_ENCHANTING_TABLE, ModTags.ENCHANTMENT_TABLE_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.CONDUIT, ModRegistry.ENCHANTED_CONDUIT, ModTags.CONDUIT_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.CRAFTING_TABLE, ModRegistry.ENCHANTED_CRAFTING_TABLE, ModTags.CRAFTING_TABLE_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.BEEHIVE, ModRegistry.ENCHANTED_BEEHIVE, ModTags.BEEHIVE_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.CHEST, ModRegistry.ENCHANTED_CHEST, ModTags.CHEST_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.TRAPPED_CHEST, ModRegistry.ENCHANTED_TRAPPED_CHEST, ModTags.TRAPPED_CHEST_APPLICABLE);
+		ReplacementUtil.addReplacement(Blocks.FURNACE, ModRegistry.ENCHANTED_FURNACE);
+		ReplacementUtil.addReplacement(Blocks.BLAST_FURNACE, ModRegistry.ENCHANTED_BLAST_FURNACE);
+		ReplacementUtil.addReplacement(Blocks.SMOKER, ModRegistry.ENCHANTED_SMOKER);
+		ReplacementUtil.addReplacement(Blocks.BEACON, ModRegistry.ENCHANTED_BEACON);
+		ReplacementUtil.addReplacement(Blocks.CAMPFIRE, ModRegistry.ENCHANTED_CAMPFIRE);
+		ReplacementUtil.addReplacement(Blocks.SOUL_CAMPFIRE, ModRegistry.ENCHANTED_SOUL_CAMPFIRE);
+		ReplacementUtil.addReplacement(Blocks.MAGMA_BLOCK, ModRegistry.ENCHANTED_MAGMA_BLOCK);
+		ReplacementUtil.addReplacement(Blocks.DISPENSER, ModRegistry.ENCHANTED_DISPENSER);
+		ReplacementUtil.addReplacement(Blocks.RESPAWN_ANCHOR, ModRegistry.ENCHANTED_RESPAWN_ANCHOR);
+		ReplacementUtil.addReplacement(Blocks.HOPPER, ModRegistry.ENCHANTED_HOPPER);
+		ReplacementUtil.addReplacement(Blocks.ENCHANTING_TABLE, ModRegistry.ENCHANTED_ENCHANTING_TABLE);
+		ReplacementUtil.addReplacement(Blocks.CONDUIT, ModRegistry.ENCHANTED_CONDUIT);
+		ReplacementUtil.addReplacement(Blocks.CRAFTING_TABLE, ModRegistry.ENCHANTED_CRAFTING_TABLE);
+		ReplacementUtil.addReplacement(Blocks.BEEHIVE, ModRegistry.ENCHANTED_BEEHIVE);
+		ReplacementUtil.addReplacement(Blocks.CHEST, ModRegistry.ENCHANTED_CHEST);
+		ReplacementUtil.addReplacement(Blocks.TRAPPED_CHEST, ModRegistry.ENCHANTED_TRAPPED_CHEST);
 
-		ReplacementUtil.addReplacement(Blocks.WHITE_BED, ModRegistry.ENCHANTED_WHITE_BED, ModTags.WHITE_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.ORANGE_BED, ModRegistry.ENCHANTED_ORANGE_BED, ModTags.ORANGE_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.MAGENTA_BED, ModRegistry.ENCHANTED_MAGENTA_BED, ModTags.MAGENTA_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.LIGHT_BLUE_BED, ModRegistry.ENCHANTED_LIGHT_BLUE_BED, ModTags.LIGHT_BLUE_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.YELLOW_BED, ModRegistry.ENCHANTED_YELLOW_BED, ModTags.YELLOW_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.LIME_BED, ModRegistry.ENCHANTED_LIME_BED, ModTags.LIME_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.PINK_BED, ModRegistry.ENCHANTED_PINK_BED, ModTags.PINK_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.GRAY_BED, ModRegistry.ENCHANTED_GRAY_BED, ModTags.GRAY_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.LIGHT_GRAY_BED, ModRegistry.ENCHANTED_LIGHT_GRAY_BED, ModTags.LIGHT_GRAY_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.CYAN_BED, ModRegistry.ENCHANTED_CYAN_BED, ModTags.CYAN_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.PURPLE_BED, ModRegistry.ENCHANTED_PURPLE_BED, ModTags.PURPLE_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.BLUE_BED, ModRegistry.ENCHANTED_BLUE_BED, ModTags.BLUE_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.BROWN_BED, ModRegistry.ENCHANTED_BROWN_BED, ModTags.BROWN_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.GREEN_BED, ModRegistry.ENCHANTED_GREEN_BED, ModTags.GREEN_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.RED_BED, ModRegistry.ENCHANTED_RED_BED, ModTags.RED_BED_APPLICABLE);
-		ReplacementUtil.addReplacement(Blocks.BLACK_BED, ModRegistry.ENCHANTED_BLACK_BED, ModTags.BLACK_BED_APPLICABLE);
+		ReplacementUtil.addReplacement(Blocks.WHITE_BED, ModRegistry.ENCHANTED_WHITE_BED);
+		ReplacementUtil.addReplacement(Blocks.ORANGE_BED, ModRegistry.ENCHANTED_ORANGE_BED);
+		ReplacementUtil.addReplacement(Blocks.MAGENTA_BED, ModRegistry.ENCHANTED_MAGENTA_BED);
+		ReplacementUtil.addReplacement(Blocks.LIGHT_BLUE_BED, ModRegistry.ENCHANTED_LIGHT_BLUE_BED);
+		ReplacementUtil.addReplacement(Blocks.YELLOW_BED, ModRegistry.ENCHANTED_YELLOW_BED);
+		ReplacementUtil.addReplacement(Blocks.LIME_BED, ModRegistry.ENCHANTED_LIME_BED);
+		ReplacementUtil.addReplacement(Blocks.PINK_BED, ModRegistry.ENCHANTED_PINK_BED);
+		ReplacementUtil.addReplacement(Blocks.GRAY_BED, ModRegistry.ENCHANTED_GRAY_BED);
+		ReplacementUtil.addReplacement(Blocks.LIGHT_GRAY_BED, ModRegistry.ENCHANTED_LIGHT_GRAY_BED);
+		ReplacementUtil.addReplacement(Blocks.CYAN_BED, ModRegistry.ENCHANTED_CYAN_BED);
+		ReplacementUtil.addReplacement(Blocks.PURPLE_BED, ModRegistry.ENCHANTED_PURPLE_BED);
+		ReplacementUtil.addReplacement(Blocks.BLUE_BED, ModRegistry.ENCHANTED_BLUE_BED);
+		ReplacementUtil.addReplacement(Blocks.BROWN_BED, ModRegistry.ENCHANTED_BROWN_BED);
+		ReplacementUtil.addReplacement(Blocks.GREEN_BED, ModRegistry.ENCHANTED_GREEN_BED);
+		ReplacementUtil.addReplacement(Blocks.RED_BED, ModRegistry.ENCHANTED_RED_BED);
+		ReplacementUtil.addReplacement(Blocks.BLACK_BED, ModRegistry.ENCHANTED_BLACK_BED);
 	}
 }

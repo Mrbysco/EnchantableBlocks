@@ -1,0 +1,13 @@
+{
+  "values": [
+    "minecraft:furnace",
+    "minecraft:blast_furnace",
+    "minecraft:smoker",
+    "minecraft:beacon",
+    "minecraft:respawn_anchor",
+    "minecraft:campfire",
+    "minecraft:soul_campfire",
+    "minecraft:enchanting_table",
+    "minecraft:conduit"
+  ]
+}

@@ -1,27 +1,30 @@
 package com.mrbysco.enchantableblocks.block.blockentity;
 
+import com.mojang.serialization.Dynamic;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
+import com.mrbysco.enchantableblocks.util.EnchantmentUtil;
 import com.mrbysco.enchantableblocks.util.TagHelper;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -29,12 +32,10 @@ import net.minecraft.world.level.block.entity.CampfireBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 
-import java.util.Map;
-
 public class EnchantedCampfireBlockEntity extends CampfireBlockEntity implements IEnchantable {
 	protected boolean hideGlint = false;
 	protected ListTag enchantmentTag = null;
-	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
+	protected ItemEnchantments enchantments = ItemEnchantments.EMPTY;
 
 	public EnchantedCampfireBlockEntity(BlockPos pos, BlockState state) {
 		super(pos, state);
@@ -48,13 +49,14 @@ public class EnchantedCampfireBlockEntity extends CampfireBlockEntity implements
 			if (!inputStack.isEmpty()) {
 				flag = true;
 				int cookSpeed = 1;
-				if (blockEntity.hasEnchantment(ModEnchantments.BOILING.get())) {
-					int enchantmentLevel = blockEntity.getEnchantmentLevel(ModEnchantments.BOILING.get());
+				Holder<Enchantment> boilingHolder = EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.BOILING);
+				if (blockEntity.hasEnchantment(boilingHolder)) {
+					int enchantmentLevel = blockEntity.getEnchantmentLevel(boilingHolder);
 					cookSpeed += enchantmentLevel;
 				}
 				blockEntity.cookingProgress[i] += cookSpeed;
 				if (blockEntity.cookingProgress[i] >= blockEntity.cookingTime[i]) {
-					Container container = new SimpleContainer(inputStack);
+					SingleRecipeInput container = new SingleRecipeInput(inputStack);
 					ItemStack resultStack = blockEntity.quickCheck.getRecipeFor(container, level).map((recipe) -> {
 						return recipe.value().assemble(container, level.registryAccess());
 					}).orElse(inputStack);
@@ -121,64 +123,45 @@ public class EnchantedCampfireBlockEntity extends CampfireBlockEntity implements
 	}
 
 	@Override
-	public Map<Enchantment, Integer> getEnchantments() {
+	public ItemEnchantments getEnchantments() {
 		return enchantments;
 	}
 
 	@Override
-	public boolean hasEnchantment(Enchantment enchantment) {
-		return this.enchantments.containsKey(enchantment);
+	public boolean hasEnchantment(Holder<Enchantment> enchantment) {
+		return this.enchantments.getLevel(enchantment) > 0;
 	}
 
 	@Override
-	public int getEnchantmentLevel(Enchantment enchantment) {
+	public int getEnchantmentLevel(Holder<Enchantment> enchantment) {
 		if (this.hasEnchantment(enchantment))
-			return this.enchantments.get(enchantment);
+			return this.enchantments.getLevel(enchantment);
 		return -1;
 	}
 
 	@Override
 	public boolean hasEnchantment(TagKey<Enchantment> enchantmentTag) {
-		for (Enchantment enchantment : this.enchantments.keySet()) {
-			if (TagHelper.matchesTag(enchantment, enchantmentTag)) {
+		for (Holder<Enchantment> enchantment : this.enchantments.keySet()) {
+			if (TagHelper.matchesTag(this.level.registryAccess(), enchantment, enchantmentTag)) {
 				return true;
 			}
 		}
-		return this.enchantments.containsKey(enchantmentTag);
+		return false;
 	}
 
 	@Override
 	public int getEnchantmentLevel(TagKey<Enchantment> enchantmentTag) {
-		for (Enchantment enchantment : this.enchantments.keySet()) {
-			if (TagHelper.matchesTag(enchantment, enchantmentTag)) {
-				return this.enchantments.get(enchantment);
+		for (Holder<Enchantment> enchantment : this.enchantments.keySet()) {
+			if (TagHelper.matchesTag(this.level.registryAccess(), enchantment, enchantmentTag)) {
+				return this.enchantments.getLevel(enchantment);
 			}
 		}
 		return -1;
 	}
 
 	@Override
-	public void setEnchantments(ListTag enchantmentTags) {
-		this.enchantmentTag = enchantmentTags;
-		this.updateEnchantmentMap();
-	}
-
-	@Override
-	public ListTag getEnchantmentsTag() {
-		return this.enchantmentTag;
-	}
-
-	@Override
-	public void updateEnchantmentMap() {
-		this.enchantments.clear();
-		if (this.enchantmentTag != null) {
-			EnchantmentHelper.deserializeEnchantments(this.enchantmentTag).forEach((enchantment, integer) -> {
-				if (enchantment != null) {
-					this.enchantments.put(enchantment, integer);
-				}
-			});
-			this.hideGlint = this.hasEnchantment(ModEnchantments.GLINTLESS.get());
-		}
+	public void setEnchantments(ItemEnchantments enchantments) {
+		this.enchantments = enchantments;
 	}
 
 	@Override
@@ -187,19 +170,47 @@ public class EnchantedCampfireBlockEntity extends CampfireBlockEntity implements
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
 		if (tag.contains("Enchantments")) {
-			this.enchantmentTag = tag.getList("Enchantments", Tag.TAG_COMPOUND);
-			this.updateEnchantmentMap();
+			ItemEnchantments.CODEC
+					.parse(new Dynamic<>(NbtOps.INSTANCE, tag.get("Enchantments")))
+					.resultOrPartial()
+					.ifPresent(enchantments -> this.enchantments = enchantments);
+			this.enchantments = ItemEnchantments.CODEC.parse(NbtOps.INSTANCE, tag.get("Enchantments")).result().orElse(null);
 		}
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
-		if (this.enchantmentTag != null)
-			tag.put("Enchantments", enchantmentTag);
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
+		if (this.enchantments != null) {
+			ItemEnchantments.CODEC
+					.encodeStart(NbtOps.INSTANCE, this.enchantments)
+					.resultOrPartial()
+					.ifPresent(enchantments -> tag.put("Enchantments", enchantments));
+		}
+	}
+
+	@Override
+	protected void applyImplicitComponents(DataComponentInput componentInput) {
+		super.applyImplicitComponents(componentInput);
+		ItemEnchantments enchantments = componentInput.get(DataComponents.ENCHANTMENTS);
+		if (enchantments != null) {
+			this.enchantments = enchantments;
+		}
+	}
+
+	@Override
+	protected void collectImplicitComponents(DataComponentMap.Builder pComponents) {
+		super.collectImplicitComponents(pComponents);
+		pComponents.set(DataComponents.ENCHANTMENTS, this.getEnchantments());
+	}
+
+	@Override
+	public void removeComponentsFromTag(CompoundTag tag) {
+		super.removeComponentsFromTag(tag);
+
 	}
 
 	//Sync stuff
@@ -209,10 +220,10 @@ public class EnchantedCampfireBlockEntity extends CampfireBlockEntity implements
 	}
 
 	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
 		var tag = packet.getTag();
 		if (tag != null) {
-			handleUpdateTag(tag);
+			handleUpdateTag(tag, registries);
 
 			BlockState state = level.getBlockState(worldPosition);
 			level.sendBlockUpdated(worldPosition, state, state, 3);
@@ -229,19 +240,19 @@ public class EnchantedCampfireBlockEntity extends CampfireBlockEntity implements
 	}
 
 	@Override
-	public CompoundTag getUpdateTag() {
-		return saveWithoutMetadata();
+	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+		return saveWithoutMetadata(registries);
 	}
 
 	@Override
-	public void handleUpdateTag(CompoundTag tag) {
-		load(tag);
+	public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+		loadAdditional(tag, registries);
 	}
 
 	@Override
 	public CompoundTag getPersistentData() {
 		CompoundTag tag = new CompoundTag();
-		this.saveAdditional(tag);
+		this.saveAdditional(tag, this.level.registryAccess());
 		return tag;
 	}
 }

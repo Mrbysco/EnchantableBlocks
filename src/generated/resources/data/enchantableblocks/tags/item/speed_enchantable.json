@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:furnace",
+    "minecraft:blast_furnace",
+    "minecraft:smoker",
+    "minecraft:hopper",
+    "minecraft:beehive"
+  ]
+}

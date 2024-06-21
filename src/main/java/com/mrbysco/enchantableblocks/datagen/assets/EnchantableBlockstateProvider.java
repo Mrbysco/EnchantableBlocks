@@ -61,7 +61,7 @@ public class EnchantableBlockstateProvider extends BlockStateProvider {
 
 	private void simpleCutoutEnchantedBlock(DeferredBlock<? extends Block> enchantedBlock, String originalBlock) {
 		simpleBlock(enchantedBlock.get(), models()
-				.withExistingParent("enchantableblocks:block/" + enchantedBlock.getId().getPath(), "minecraft:block/" + originalBlock).renderType(new ResourceLocation("cutout")));
+				.withExistingParent("enchantableblocks:block/" + enchantedBlock.getId().getPath(), "minecraft:block/" + originalBlock).renderType(ResourceLocation.tryParse("cutout")));
 	}
 
 	private void beehive(DeferredBlock<? extends Block> registryObject) {
@@ -168,6 +168,6 @@ public class EnchantableBlockstateProvider extends BlockStateProvider {
 	}
 
 	private ResourceLocation suffix(ResourceLocation location, String suffix) {
-		return new ResourceLocation(location.getNamespace(), location.getPath() + suffix);
+		return ResourceLocation.fromNamespaceAndPath(location.getNamespace(), location.getPath() + suffix);
 	}
 }

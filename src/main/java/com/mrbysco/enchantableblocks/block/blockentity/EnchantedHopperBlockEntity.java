@@ -1,16 +1,20 @@
 package com.mrbysco.enchantableblocks.block.blockentity;
 
+import com.mojang.serialization.Dynamic;
 import com.mrbysco.enchantableblocks.mixin.HopperBlockEntityAccessor;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
+import com.mrbysco.enchantableblocks.util.EnchantmentUtil;
 import com.mrbysco.enchantableblocks.util.TagHelper;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.tags.TagKey;
@@ -23,8 +27,8 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChestBlock;
@@ -42,14 +46,13 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.stream.IntStream;
 
 public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEnchantable {
 	protected boolean hideGlint = false;
 	protected ListTag enchantmentTag = null;
-	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
+	protected ItemEnchantments enchantments = ItemEnchantments.EMPTY;
 
 	public EnchantedHopperBlockEntity(BlockPos pos, BlockState state) {
 		super(pos, state);
@@ -62,15 +65,17 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 
 	public static void pushItemsTick(Level level, BlockPos pos, BlockState state, EnchantedHopperBlockEntity blockEntity) {
 		int speed = 1;
-		if (blockEntity.hasEnchantment(ModEnchantments.SPEED.get())) {
-			speed = blockEntity.getEnchantmentLevel(ModEnchantments.SPEED.get()) + 1;
+		Holder<Enchantment> speedHolder = EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.SPEED);
+		if (blockEntity.hasEnchantment(speedHolder)) {
+			speed = blockEntity.getEnchantmentLevel(speedHolder) + 1;
 		}
 		blockEntity.cooldownTime -= speed;
 		blockEntity.tickedGameTime = level.getGameTime();
 		if (!((HopperBlockEntityAccessor) blockEntity).invokeIsOnCooldown()) {
 			int count = 1;
-			if (blockEntity.hasEnchantment(Enchantments.BLOCK_EFFICIENCY)) {
-				int enchantmentLevel = Mth.clamp(blockEntity.getEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY), 0, 5);
+			Holder<Enchantment> efficiencyHolder = EnchantmentUtil.getEnchantmentHolder(level, Enchantments.EFFICIENCY);
+			if (blockEntity.hasEnchantment(efficiencyHolder)) {
+				int enchantmentLevel = Mth.clamp(blockEntity.getEnchantmentLevel(efficiencyHolder), 0, 5);
 				count = switch (enchantmentLevel) {
 					case 1 -> 4;
 					case 2 -> 8;
@@ -101,7 +106,7 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 							ItemStack destStack = hopper.getItem(j);
 							if (hopper.canPlaceItem(j, extractItem) && (destStack.isEmpty() ||
 									destStack.getCount() < destStack.getMaxStackSize() && destStack.getCount() <
-											hopper.getMaxStackSize() && ItemHandlerHelper.canItemStacksStack(extractItem, destStack))) {
+											hopper.getMaxStackSize() && ItemStack.isSameItemSameComponents(extractItem, destStack))) {
 								actualCount = Math.min(slotStack.getCount(), Math.min(count, destStack.getMaxStackSize() - destStack.getCount()));
 								extractItem = itemHandler.extractItem(i, actualCount, false);
 
@@ -235,8 +240,9 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 
 	private static boolean ejectItems(Level level, BlockPos pos, BlockState state, EnchantedHopperBlockEntity sourceContainer) {
 		int count = 1;
-		if (sourceContainer.hasEnchantment(Enchantments.BLOCK_EFFICIENCY)) {
-			int enchantmentLevel = Mth.clamp(sourceContainer.getEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY), 0, 5);
+		Holder<Enchantment> efficiencyHolder = EnchantmentUtil.getEnchantmentHolder(level, Enchantments.EFFICIENCY);
+		if (sourceContainer.hasEnchantment(efficiencyHolder)) {
+			int enchantmentLevel = Mth.clamp(sourceContainer.getEnchantmentLevel(efficiencyHolder), 0, 5);
 			count = switch (enchantmentLevel) {
 				case 1 -> 4;
 				case 2 -> 8;
@@ -322,64 +328,45 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 	}
 
 	@Override
-	public Map<Enchantment, Integer> getEnchantments() {
+	public ItemEnchantments getEnchantments() {
 		return enchantments;
 	}
 
 	@Override
-	public boolean hasEnchantment(Enchantment enchantment) {
-		return this.enchantments.containsKey(enchantment);
+	public boolean hasEnchantment(Holder<Enchantment> enchantment) {
+		return this.enchantments.getLevel(enchantment) > 0;
 	}
 
 	@Override
-	public int getEnchantmentLevel(Enchantment enchantment) {
+	public int getEnchantmentLevel(Holder<Enchantment> enchantment) {
 		if (this.hasEnchantment(enchantment))
-			return this.enchantments.get(enchantment);
+			return this.enchantments.getLevel(enchantment);
 		return -1;
 	}
 
 	@Override
 	public boolean hasEnchantment(TagKey<Enchantment> enchantmentTag) {
-		for (Enchantment enchantment : this.enchantments.keySet()) {
-			if (TagHelper.matchesTag(enchantment, enchantmentTag)) {
+		for (Holder<Enchantment> enchantment : this.enchantments.keySet()) {
+			if (TagHelper.matchesTag(this.level.registryAccess(), enchantment, enchantmentTag)) {
 				return true;
 			}
 		}
-		return this.enchantments.containsKey(enchantmentTag);
+		return false;
 	}
 
 	@Override
 	public int getEnchantmentLevel(TagKey<Enchantment> enchantmentTag) {
-		for (Enchantment enchantment : this.enchantments.keySet()) {
-			if (TagHelper.matchesTag(enchantment, enchantmentTag)) {
-				return this.enchantments.get(enchantment);
+		for (Holder<Enchantment> enchantment : this.enchantments.keySet()) {
+			if (TagHelper.matchesTag(this.level.registryAccess(), enchantment, enchantmentTag)) {
+				return this.enchantments.getLevel(enchantment);
 			}
 		}
 		return -1;
 	}
 
 	@Override
-	public void setEnchantments(ListTag enchantmentTags) {
-		this.enchantmentTag = enchantmentTags;
-		this.updateEnchantmentMap();
-	}
-
-	@Override
-	public ListTag getEnchantmentsTag() {
-		return this.enchantmentTag;
-	}
-
-	@Override
-	public void updateEnchantmentMap() {
-		this.enchantments.clear();
-		if (this.enchantmentTag != null) {
-			EnchantmentHelper.deserializeEnchantments(this.enchantmentTag).forEach((enchantment, integer) -> {
-				if (enchantment != null) {
-					this.enchantments.put(enchantment, integer);
-				}
-			});
-			this.hideGlint = this.hasEnchantment(ModEnchantments.GLINTLESS.get());
-		}
+	public void setEnchantments(ItemEnchantments enchantments) {
+		this.enchantments = enchantments;
 	}
 
 	@Override
@@ -388,19 +375,47 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
 		if (tag.contains("Enchantments")) {
-			this.enchantmentTag = tag.getList("Enchantments", Tag.TAG_COMPOUND);
-			this.updateEnchantmentMap();
+			ItemEnchantments.CODEC
+					.parse(new Dynamic<>(NbtOps.INSTANCE, tag.get("Enchantments")))
+					.resultOrPartial()
+					.ifPresent(enchantments -> this.enchantments = enchantments);
+			this.enchantments = ItemEnchantments.CODEC.parse(NbtOps.INSTANCE, tag.get("Enchantments")).result().orElse(null);
 		}
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
-		if (this.enchantmentTag != null)
-			tag.put("Enchantments", enchantmentTag);
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
+		if (this.enchantments != null) {
+			ItemEnchantments.CODEC
+					.encodeStart(NbtOps.INSTANCE, this.enchantments)
+					.resultOrPartial()
+					.ifPresent(enchantments -> tag.put("Enchantments", enchantments));
+		}
+	}
+
+	@Override
+	protected void applyImplicitComponents(DataComponentInput componentInput) {
+		super.applyImplicitComponents(componentInput);
+		ItemEnchantments enchantments = componentInput.get(DataComponents.ENCHANTMENTS);
+		if (enchantments != null) {
+			this.enchantments = enchantments;
+		}
+	}
+
+	@Override
+	protected void collectImplicitComponents(DataComponentMap.Builder pComponents) {
+		super.collectImplicitComponents(pComponents);
+		pComponents.set(DataComponents.ENCHANTMENTS, this.getEnchantments());
+	}
+
+	@Override
+	public void removeComponentsFromTag(CompoundTag tag) {
+		super.removeComponentsFromTag(tag);
+
 	}
 
 	//Sync stuff
@@ -410,10 +425,10 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 	}
 
 	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
 		var tag = packet.getTag();
 		if (tag != null) {
-			handleUpdateTag(tag);
+			handleUpdateTag(tag, registries);
 
 			BlockState state = level.getBlockState(worldPosition);
 			level.sendBlockUpdated(worldPosition, state, state, 3);
@@ -430,19 +445,19 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 	}
 
 	@Override
-	public CompoundTag getUpdateTag() {
-		return saveWithoutMetadata();
+	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+		return saveWithoutMetadata(registries);
 	}
 
 	@Override
-	public void handleUpdateTag(CompoundTag tag) {
-		load(tag);
+	public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+		loadAdditional(tag, registries);
 	}
 
 	@Override
 	public CompoundTag getPersistentData() {
 		CompoundTag tag = new CompoundTag();
-		this.saveAdditional(tag);
+		this.saveAdditional(tag, this.level.registryAccess());
 		return tag;
 	}
 }

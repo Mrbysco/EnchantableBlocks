@@ -1,12 +1,23 @@
 package com.mrbysco.enchantableblocks.datagen.data;
 
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
+import net.minecraft.advancements.critereon.EnchantmentPredicate;
+import net.minecraft.advancements.critereon.ItemEnchantmentsPredicate;
+import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.critereon.ItemSubPredicates;
+import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.BeehiveBlock;
 import net.minecraft.world.level.block.Block;
@@ -17,29 +28,29 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.CopyBlockState;
+import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
 import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
-import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
-import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public class EnchantableLootProvider extends LootTableProvider {
-	public EnchantableLootProvider(PackOutput packOutput) {
+	public EnchantableLootProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
 		super(packOutput, Set.of(), List.of(
 				new SubProviderEntry(EnchantableBlockLootSubProvider::new, LootContextParamSets.BLOCK)
-		));
+		), lookupProvider);
 	}
 
 	private static class EnchantableBlockLootSubProvider extends BlockLootSubProvider {
 
-		protected EnchantableBlockLootSubProvider() {
-			super(Set.of(), FeatureFlags.REGISTRY.allFlags());
+		protected EnchantableBlockLootSubProvider(HolderLookup.Provider provider) {
+			super(Set.of(), FeatureFlags.REGISTRY.allFlags(), provider);
 		}
 
 		@Override
@@ -79,14 +90,13 @@ public class EnchantableLootProvider extends LootTableProvider {
 			this.add(ModRegistry.ENCHANTED_BLACK_BED.get(), (block) -> createEnchantableBedBlockTable(block, Blocks.BLACK_BED));
 		}
 
-		protected static LootTable.Builder createEnchantedBeeHiveDrop(Block block, Block originalBlock) {
+		protected LootTable.Builder createEnchantedBeeHiveDrop(Block block, Block originalBlock) {
 			return LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F))
-					.add(LootItem.lootTableItem(originalBlock).when(HAS_SILK_TOUCH)
-							.apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY)
-									.copy("Bees", "BlockEntityTag.Bees"))
+					.add(LootItem.lootTableItem(originalBlock).when(this.hasSilkTouch())
+							.apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+									.include(DataComponents.BEES).include(DataComponents.ENCHANTMENTS))
 							.apply(CopyBlockState.copyState(block).copy(BeehiveBlock.HONEY_LEVEL))
 							.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
-							.apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Enchantments", "Enchantments"))
 							.otherwise(LootItem.lootTableItem(originalBlock))));
 		}
 
@@ -97,7 +107,8 @@ public class EnchantableLootProvider extends LootTableProvider {
 									.setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BedBlock.PART, BedPart.HEAD))
 							)
 							.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
-							.apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Enchantments", "Enchantments"))
+							.apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+									.include(DataComponents.ENCHANTMENTS))
 					)
 			));
 		}
@@ -107,10 +118,24 @@ public class EnchantableLootProvider extends LootTableProvider {
 					.withPool(this.applyExplosionCondition(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F))
 									.add(LootItem.lootTableItem(originalBlock)
 											.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
-											.apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Enchantments", "Enchantments"))
+											.apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+													.include(DataComponents.ENCHANTMENTS))
 									)
 							)
 					);
+		}
+
+		protected LootItemCondition.Builder hasSilkTouch() {
+			HolderLookup.RegistryLookup<Enchantment> registrylookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+			return MatchTool.toolMatches(
+					ItemPredicate.Builder.item()
+							.withSubPredicate(
+									ItemSubPredicates.ENCHANTMENTS,
+									ItemEnchantmentsPredicate.enchantments(
+											List.of(new EnchantmentPredicate(registrylookup.getOrThrow(Enchantments.SILK_TOUCH), MinMaxBounds.Ints.atLeast(1)))
+									)
+							)
+			);
 		}
 
 		@Override
@@ -120,7 +145,7 @@ public class EnchantableLootProvider extends LootTableProvider {
 	}
 
 	@Override
-	protected void validate(Map<ResourceLocation, LootTable> map, @NotNull ValidationContext validationContext) {
-		map.forEach((location, lootTable) -> lootTable.validate(validationContext));
+	protected void validate(WritableRegistry<LootTable> writableregistry, ValidationContext validationcontext, ProblemReporter.Collector problemreporter$collector) {
+		super.validate(writableregistry, validationcontext, problemreporter$collector);
 	}
 }

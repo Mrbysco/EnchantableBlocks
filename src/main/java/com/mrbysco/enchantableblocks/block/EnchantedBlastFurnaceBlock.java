@@ -4,23 +4,23 @@ import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.block.blockentity.furnace.AbstractEnchantedFurnaceBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.furnace.EnchantedBlastFurnaceBlockEntity;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
+import com.mrbysco.enchantableblocks.util.EnchantmentUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BlastFurnaceBlock;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -52,8 +52,9 @@ public class EnchantedBlastFurnaceBlock extends BlastFurnaceBlock {
 		float explosionResistance = super.getExplosionResistance(state, level, pos, explosion);
 		BlockEntity blockentity = level.getBlockEntity(pos);
 		if (blockentity instanceof IEnchantable enchantable) {
-			if (enchantable.hasEnchantment(Enchantments.BLAST_PROTECTION)) {
-				int enchantmentLevel = enchantable.getEnchantmentLevel(Enchantments.BLAST_PROTECTION);
+			Holder<Enchantment> blastHolder = EnchantmentUtil.getEnchantmentHolder(blockentity, Enchantments.BLAST_PROTECTION);
+			if (enchantable.hasEnchantment(blastHolder)) {
+				int enchantmentLevel = enchantable.getEnchantmentLevel(blastHolder);
 				explosionResistance *= ((enchantmentLevel + 1) * 30);
 			}
 		}
@@ -66,7 +67,7 @@ public class EnchantedBlastFurnaceBlock extends BlastFurnaceBlock {
 			BlockEntity blockentity = level.getBlockEntity(pos);
 			if (blockentity instanceof AbstractEnchantedFurnaceBlockEntity enchantedFurnaceBlockEntity) {
 				if (level instanceof ServerLevel) {
-					if (!enchantedFurnaceBlockEntity.hasEnchantment(Enchantments.VANISHING_CURSE)) {
+					if (!enchantedFurnaceBlockEntity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(blockentity, Enchantments.VANISHING_CURSE))) {
 						Containers.dropContents(level, pos, enchantedFurnaceBlockEntity);
 						enchantedFurnaceBlockEntity.getRecipesToAwardAndPopExperience((ServerLevel) level, Vec3.atCenterOf(pos));
 					}
@@ -85,20 +86,11 @@ public class EnchantedBlastFurnaceBlock extends BlastFurnaceBlock {
 	public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
 		BlockEntity blockentity = params.getParameter(LootContextParams.BLOCK_ENTITY);
 		if (blockentity instanceof IEnchantable enchantable) {
-			if (enchantable.hasEnchantment(Enchantments.VANISHING_CURSE)) {
+			if (enchantable.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(blockentity, Enchantments.VANISHING_CURSE))) {
 				return List.of();
 			}
 		}
 		return super.getDrops(state, params);
-	}
-
-	@Override
-	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
-		ItemStack originalStack = new ItemStack(Blocks.BLAST_FURNACE);
-		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity && blockEntity.getEnchantmentsTag() != null) {
-			originalStack.getOrCreateTag().put("Enchantments", blockEntity.getEnchantmentsTag());
-		}
-		return originalStack;
 	}
 
 	@Override
@@ -110,14 +102,6 @@ public class EnchantedBlastFurnaceBlock extends BlastFurnaceBlock {
 		}
 	}
 
-	@Override
-	public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		super.setPlacedBy(level, pos, state, placer, stack);
-		BlockEntity blockentity = level.getBlockEntity(pos);
-		if (blockentity instanceof IEnchantable enchantable) {
-			enchantable.setEnchantments(stack.getEnchantmentTags());
-		}
-	}
 
 	@Nullable
 	@Override

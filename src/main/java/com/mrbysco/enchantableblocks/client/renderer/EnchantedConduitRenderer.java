@@ -39,7 +39,7 @@ public class EnchantedConduitRenderer extends ConduitRenderer {
 			if (renderEnchantment) {
 				PoseStack.Pose pose = poseStack.last();
 				shellConsumer = VertexMultiConsumer.create(
-						new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose.pose(), pose.normal(), 0.0078125F),
+						new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose, 0.0078125F),
 						SHELL_TEXTURE.buffer(bufferSource, RenderType::entitySolid));
 			} else {
 				shellConsumer = SHELL_TEXTURE.buffer(bufferSource, RenderType::entitySolid);
@@ -71,7 +71,7 @@ public class EnchantedConduitRenderer extends ConduitRenderer {
 			VertexConsumer windConsumer;
 			if (renderEnchantment) {
 				PoseStack.Pose pose = poseStack.last();
-				windConsumer = VertexMultiConsumer.create(new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose.pose(), pose.normal(), 0.0078125F),
+				windConsumer = VertexMultiConsumer.create(new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose, 0.0078125F),
 						(i == 1 ? VERTICAL_WIND_TEXTURE : WIND_TEXTURE).buffer(bufferSource, RenderType::entityCutoutNoCull));
 			} else {
 				windConsumer = (i == 1 ? VERTICAL_WIND_TEXTURE : WIND_TEXTURE).buffer(bufferSource, RenderType::entityCutoutNoCull);

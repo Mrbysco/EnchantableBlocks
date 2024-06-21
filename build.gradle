@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.142'
+    id 'net.neoforged.gradle.userdev' version '7.0.145'
     id 'net.darkhax.curseforgegradle' version '1.1.24'
     id 'com.modrinth.minotaur' version "2.+"
 }
@@ -14,8 +14,8 @@ base {
     archivesName = "${mod_archive_name}-${mc_version}"
 }
 
-// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+// Mojang ships Java 21 to end users in 1.20.5+, so your mod should target Java 21.
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
 //minecraft.accessTransformers.entry public net.minecraft.client.Minecraft textureManager # textureManager
@@ -85,11 +85,11 @@ dependencies {
 
     runtimeOnly "mezz.jei:jei-${mc_version}-neoforge:${jei_version}"
 
-    implementation "curse.maven:jade-324717:5109393"
-    implementation "curse.maven:the-one-probe-245211:5159289"
+    implementation "curse.maven:jade-324717:5444008"
+    implementation "curse.maven:the-one-probe-245211:5431197"
 
-    runtimeOnly "curse.maven:bookshelf-228525:5251135"
-    runtimeOnly "curse.maven:enchantment-descriptions-250419:5264037"
+//    runtimeOnly "curse.maven:bookshelf-228525:5251135"
+//    runtimeOnly "curse.maven:enchantment-descriptions-250419:5264037"
 }
 
 jar {
@@ -136,7 +136,7 @@ if (System.getenv().CURSEFORGE_KEY) {
         mainFile.releaseType = 'beta'
         mainFile.addModLoader("NeoForge")
         mainFile.addGameVersion("${mc_version}")
-        mainFile.addJavaVersion("Java 17")
+        mainFile.addJavaVersion("Java 21")
         mainFile.addEnvironment('Server', 'Client')
 
         mainFile.changelog = file("$project.rootDir/changelog.md")

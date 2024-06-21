@@ -4,6 +4,7 @@ import com.mrbysco.enchantableblocks.block.blockentity.EnchantedCraftingTableBlo
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModMenus;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
+import com.mrbysco.enchantableblocks.util.EnchantmentUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,8 +22,8 @@ import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -32,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.Optional;
 
-public class EnchantedCraftingMenu extends RecipeBookMenu<CraftingContainer> {
+public class EnchantedCraftingMenu extends RecipeBookMenu<CraftingInput, CraftingRecipe> {
 	public final CraftingContainer craftMatrix;
 	private final ResultContainer resultSlots = new ResultContainer();
 	private final ContainerLevelAccess access;
@@ -59,7 +60,7 @@ public class EnchantedCraftingMenu extends RecipeBookMenu<CraftingContainer> {
 		this.access = ContainerLevelAccess.create(blockEntity.getLevel(), blockEntity.getBlockPos());
 		this.player = playerInventory.player;
 
-		if (blockEntity.hasEnchantment(ModEnchantments.PRESERVATION.get()))
+		if (blockEntity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(blockEntity.getLevel(), ModEnchantments.PRESERVATION)))
 			this.craftMatrix = new EnchantedCraftingContainer(this, blockEntity.handler);
 		else
 			this.craftMatrix = new TransientCraftingContainer(this, 3, 3);
@@ -89,11 +90,11 @@ public class EnchantedCraftingMenu extends RecipeBookMenu<CraftingContainer> {
 		if (!pLevel.isClientSide) {
 			ServerPlayer serverplayer = (ServerPlayer) pPlayer;
 			ItemStack itemstack = ItemStack.EMPTY;
-			Optional<RecipeHolder<CraftingRecipe>> optional = pLevel.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, pContainer, pLevel);
+			Optional<RecipeHolder<CraftingRecipe>> optional = pLevel.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, pContainer.asCraftInput(), pLevel);
 			if (optional.isPresent()) {
 				RecipeHolder<CraftingRecipe> craftingrecipe = optional.get();
 				if (pResult.setRecipeUsed(pLevel, serverplayer, craftingrecipe)) {
-					ItemStack itemstack1 = craftingrecipe.value().assemble(pContainer, pLevel.registryAccess());
+					ItemStack itemstack1 = craftingrecipe.value().assemble(pContainer.asCraftInput(), pLevel.registryAccess());
 					if (itemstack1.isItemEnabled(pLevel.enabledFeatures())) {
 						itemstack = itemstack1;
 					}
@@ -109,28 +110,33 @@ public class EnchantedCraftingMenu extends RecipeBookMenu<CraftingContainer> {
 	/**
 	 * Callback for when the crafting matrix is changed.
 	 */
+	@Override
 	public void slotsChanged(Container pInventory) {
 		this.access.execute((p_39386_, p_39387_) -> {
 			slotChangedCraftingGrid(this, p_39386_, this.player, this.craftMatrix, this.resultSlots);
 		});
 	}
 
+	@Override
 	public void fillCraftSlotsStackedContents(StackedContents itemHelper) {
 		this.craftMatrix.fillStackedContents(itemHelper);
 	}
 
+	@Override
 	public void clearCraftingContent() {
 		this.craftMatrix.clearContent();
 		this.resultSlots.clearContent();
 	}
 
-	public boolean recipeMatches(RecipeHolder<? extends Recipe<CraftingContainer>> recipe) {
-		return recipe.value().matches(this.craftMatrix, this.player.level());
+	@Override
+	public boolean recipeMatches(RecipeHolder<CraftingRecipe> recipe) {
+		return recipe.value().matches(this.craftMatrix.asCraftInput(), this.player.level());
 	}
 
 	/**
 	 * Called when the container is closed.
 	 */
+	@Override
 	public void removed(Player player) {
 		super.removed(player);
 		if (!(this.craftMatrix instanceof EnchantedCraftingContainer)) {
@@ -189,30 +195,37 @@ public class EnchantedCraftingMenu extends RecipeBookMenu<CraftingContainer> {
 		return itemstack;
 	}
 
+	@Override
 	public boolean canTakeItemForPickAll(ItemStack stack, Slot slot) {
 		return slot.container != this.resultSlots && super.canTakeItemForPickAll(stack, slot);
 	}
 
+	@Override
 	public int getResultSlotIndex() {
 		return 0;
 	}
 
+	@Override
 	public int getGridWidth() {
 		return this.craftMatrix.getWidth();
 	}
 
+	@Override
 	public int getGridHeight() {
 		return this.craftMatrix.getHeight();
 	}
 
+	@Override
 	public int getSize() {
 		return 10;
 	}
 
+	@Override
 	public RecipeBookType getRecipeBookType() {
 		return RecipeBookType.CRAFTING;
 	}
 
+	@Override
 	public boolean shouldMoveToInventory(int pSlotIndex) {
 		return pSlotIndex != this.getResultSlotIndex();
 	}

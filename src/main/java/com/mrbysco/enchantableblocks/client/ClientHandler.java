@@ -10,7 +10,6 @@ import com.mrbysco.enchantableblocks.client.renderer.EnchantedEnchantTableRender
 import com.mrbysco.enchantableblocks.client.screen.EnchantedCraftingScreen;
 import com.mrbysco.enchantableblocks.registry.ModMenus;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.inventory.BeaconScreen;
 import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;

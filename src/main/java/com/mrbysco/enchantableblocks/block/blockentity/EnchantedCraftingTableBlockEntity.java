@@ -3,6 +3,7 @@ package com.mrbysco.enchantableblocks.block.blockentity;
 import com.mrbysco.enchantableblocks.menu.crafting.EnchantedCraftingMenu;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
@@ -26,15 +27,15 @@ public class EnchantedCraftingTableBlockEntity extends AbstractEnchantedBlockEnt
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
-		this.handler.deserializeNBT(tag.getCompound("ItemHandler"));
+	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
+		this.handler.deserializeNBT(registries, tag.getCompound("ItemHandler"));
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
-		tag.put("ItemHandler", handler.serializeNBT());
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
+		tag.put("ItemHandler", handler.serializeNBT(registries));
 	}
 
 	@Override

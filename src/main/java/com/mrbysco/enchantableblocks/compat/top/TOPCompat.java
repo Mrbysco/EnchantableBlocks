@@ -7,13 +7,17 @@ import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoProvider;
 import mcjty.theoneprobe.api.ITheOneProbe;
 import mcjty.theoneprobe.api.ProbeMode;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.InterModComms;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class TOPCompat {
@@ -33,14 +37,15 @@ public class TOPCompat {
 
 		@Override
 		public ResourceLocation getID() {
-			return new ResourceLocation(EnchantableBlocks.MOD_ID, "main");
+			return ResourceLocation.fromNamespaceAndPath(EnchantableBlocks.MOD_ID, "main");
 		}
 
 		@Override
 		public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level level, BlockState state, IProbeHitData data) {
 			BlockEntity blockEntity = level.getBlockEntity(data.getPos());
 			if (blockEntity instanceof IEnchantable enchantable) {
-				enchantable.getEnchantments().forEach((enchantment, integer) -> probeInfo.mcText(enchantment.getFullname(integer)));
+				Consumer<Component> consumer = probeInfo::mcText;
+				enchantable.getEnchantments().addToTooltip(Item.TooltipContext.of(level), consumer, TooltipFlag.NORMAL);
 			}
 		}
 	}

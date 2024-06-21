@@ -1,16 +1,20 @@
 package com.mrbysco.enchantableblocks.block.blockentity;
 
+import com.mojang.serialization.Dynamic;
 import com.mrbysco.enchantableblocks.mixin.ConduitBlockEntityAccessor;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
+import com.mrbysco.enchantableblocks.util.EnchantmentUtil;
 import com.mrbysco.enchantableblocks.util.TagHelper;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvent;
@@ -26,8 +30,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.ConduitBlockEntity;
@@ -37,12 +41,11 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 
 public class EnchantedConduitBlockEntity extends ConduitBlockEntity implements IEnchantable {
 	protected boolean hideGlint = false;
 	protected ListTag enchantmentTag = null;
-	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
+	protected ItemEnchantments enchantments = ItemEnchantments.EMPTY;
 
 	public EnchantedConduitBlockEntity(BlockPos pos, BlockState state) {
 		super(pos, state);
@@ -80,11 +83,12 @@ public class EnchantedConduitBlockEntity extends ConduitBlockEntity implements I
 	}
 
 	private static void applyEffects(Level level, BlockPos pos, List<BlockPos> positions, EnchantedConduitBlockEntity blockEntity) {
-		boolean concealed = blockEntity.hasEnchantment(ModEnchantments.CONCEALED.get());
+		boolean concealed = blockEntity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.CONCEALED));
 		int blockCount = positions.size();
 		int range = blockCount / 7 * 16;
-		if (blockEntity.hasEnchantment(ModEnchantments.RANGED.get())) {
-			int enchantmentLevel = blockEntity.getEnchantmentLevel(ModEnchantments.RANGED.get());
+		Holder<Enchantment> rangedHolder = EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.RANGED);
+		if (blockEntity.hasEnchantment(rangedHolder)) {
+			int enchantmentLevel = blockEntity.getEnchantmentLevel(rangedHolder);
 			//Adjust the range based on the level of the enchantment
 			range *= (int) (1 + (enchantmentLevel * 0.5));
 		}
@@ -128,8 +132,9 @@ public class EnchantedConduitBlockEntity extends ConduitBlockEntity implements I
 		if (blockEntity.destroyTarget != null) {
 			level.playSound((Player) null, blockEntity.destroyTarget.getX(), blockEntity.destroyTarget.getY(), blockEntity.destroyTarget.getZ(), SoundEvents.CONDUIT_ATTACK_TARGET, SoundSource.BLOCKS, 1.0F, 1.0F);
 			float damage = 4.0F;
-			if (blockEntity.hasEnchantment(Enchantments.SHARPNESS)) {
-				int enchantmentLevel = blockEntity.getEnchantmentLevel(Enchantments.SHARPNESS);
+			Holder<Enchantment> sharpnessHolder = EnchantmentUtil.getEnchantmentHolder(level, Enchantments.SHARPNESS);
+			if (blockEntity.hasEnchantment(sharpnessHolder)) {
+				int enchantmentLevel = blockEntity.getEnchantmentLevel(sharpnessHolder);
 				damage += 1 + (float) Math.max(0, enchantmentLevel - 1) * 0.5F;
 			}
 			blockEntity.destroyTarget.hurt(level.damageSources().magic(), damage);
@@ -157,7 +162,7 @@ public class EnchantedConduitBlockEntity extends ConduitBlockEntity implements I
 	}
 
 	private static void animationTick(EnchantedConduitBlockEntity blockEntity, Level level, BlockPos pos, List<BlockPos> positions, @Nullable Entity entity, int tickCount) {
-		if (blockEntity.hasEnchantment(ModEnchantments.CONCEALED.get()))
+		if (blockEntity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.CONCEALED)))
 			return;
 
 		RandomSource random = level.random;
@@ -191,64 +196,45 @@ public class EnchantedConduitBlockEntity extends ConduitBlockEntity implements I
 	}
 
 	@Override
-	public Map<Enchantment, Integer> getEnchantments() {
+	public ItemEnchantments getEnchantments() {
 		return enchantments;
 	}
 
 	@Override
-	public boolean hasEnchantment(Enchantment enchantment) {
-		return this.enchantments.containsKey(enchantment);
+	public boolean hasEnchantment(Holder<Enchantment> enchantment) {
+		return this.enchantments.getLevel(enchantment) > 0;
 	}
 
 	@Override
-	public int getEnchantmentLevel(Enchantment enchantment) {
+	public int getEnchantmentLevel(Holder<Enchantment> enchantment) {
 		if (this.hasEnchantment(enchantment))
-			return this.enchantments.get(enchantment);
+			return this.enchantments.getLevel(enchantment);
 		return -1;
 	}
 
 	@Override
 	public boolean hasEnchantment(TagKey<Enchantment> enchantmentTag) {
-		for (Enchantment enchantment : this.enchantments.keySet()) {
-			if (TagHelper.matchesTag(enchantment, enchantmentTag)) {
+		for (Holder<Enchantment> enchantment : this.enchantments.keySet()) {
+			if (TagHelper.matchesTag(this.level.registryAccess(), enchantment, enchantmentTag)) {
 				return true;
 			}
 		}
-		return this.enchantments.containsKey(enchantmentTag);
+		return false;
 	}
 
 	@Override
 	public int getEnchantmentLevel(TagKey<Enchantment> enchantmentTag) {
-		for (Enchantment enchantment : this.enchantments.keySet()) {
-			if (TagHelper.matchesTag(enchantment, enchantmentTag)) {
-				return this.enchantments.get(enchantment);
+		for (Holder<Enchantment> enchantment : this.enchantments.keySet()) {
+			if (TagHelper.matchesTag(this.level.registryAccess(), enchantment, enchantmentTag)) {
+				return this.enchantments.getLevel(enchantment);
 			}
 		}
 		return -1;
 	}
 
 	@Override
-	public void setEnchantments(ListTag enchantmentTags) {
-		this.enchantmentTag = enchantmentTags;
-		this.updateEnchantmentMap();
-	}
-
-	@Override
-	public ListTag getEnchantmentsTag() {
-		return this.enchantmentTag;
-	}
-
-	@Override
-	public void updateEnchantmentMap() {
-		this.enchantments.clear();
-		if (this.enchantmentTag != null) {
-			EnchantmentHelper.deserializeEnchantments(this.enchantmentTag).forEach((enchantment, integer) -> {
-				if (enchantment != null) {
-					this.enchantments.put(enchantment, integer);
-				}
-			});
-			this.hideGlint = this.hasEnchantment(ModEnchantments.GLINTLESS.get());
-		}
+	public void setEnchantments(ItemEnchantments enchantments) {
+		this.enchantments = enchantments;
 	}
 
 	@Override
@@ -257,19 +243,47 @@ public class EnchantedConduitBlockEntity extends ConduitBlockEntity implements I
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
 		if (tag.contains("Enchantments")) {
-			this.enchantmentTag = tag.getList("Enchantments", Tag.TAG_COMPOUND);
-			this.updateEnchantmentMap();
+			ItemEnchantments.CODEC
+					.parse(new Dynamic<>(NbtOps.INSTANCE, tag.get("Enchantments")))
+					.resultOrPartial()
+					.ifPresent(enchantments -> this.enchantments = enchantments);
+			this.enchantments = ItemEnchantments.CODEC.parse(NbtOps.INSTANCE, tag.get("Enchantments")).result().orElse(null);
 		}
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
-		if (this.enchantmentTag != null)
-			tag.put("Enchantments", enchantmentTag);
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
+		if (this.enchantments != null) {
+			ItemEnchantments.CODEC
+					.encodeStart(NbtOps.INSTANCE, this.enchantments)
+					.resultOrPartial()
+					.ifPresent(enchantments -> tag.put("Enchantments", enchantments));
+		}
+	}
+
+	@Override
+	protected void applyImplicitComponents(DataComponentInput componentInput) {
+		super.applyImplicitComponents(componentInput);
+		ItemEnchantments enchantments = componentInput.get(DataComponents.ENCHANTMENTS);
+		if (enchantments != null) {
+			this.enchantments = enchantments;
+		}
+	}
+
+	@Override
+	protected void collectImplicitComponents(DataComponentMap.Builder pComponents) {
+		super.collectImplicitComponents(pComponents);
+		pComponents.set(DataComponents.ENCHANTMENTS, this.getEnchantments());
+	}
+
+	@Override
+	public void removeComponentsFromTag(CompoundTag tag) {
+		super.removeComponentsFromTag(tag);
+
 	}
 
 	//Sync stuff
@@ -279,10 +293,10 @@ public class EnchantedConduitBlockEntity extends ConduitBlockEntity implements I
 	}
 
 	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
 		var tag = packet.getTag();
 		if (tag != null) {
-			handleUpdateTag(tag);
+			handleUpdateTag(tag, registries);
 
 			BlockState state = level.getBlockState(worldPosition);
 			level.sendBlockUpdated(worldPosition, state, state, 3);
@@ -299,19 +313,19 @@ public class EnchantedConduitBlockEntity extends ConduitBlockEntity implements I
 	}
 
 	@Override
-	public CompoundTag getUpdateTag() {
-		return saveWithoutMetadata();
+	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+		return saveWithoutMetadata(registries);
 	}
 
 	@Override
-	public void handleUpdateTag(CompoundTag tag) {
-		load(tag);
+	public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+		loadAdditional(tag, registries);
 	}
 
 	@Override
 	public CompoundTag getPersistentData() {
 		CompoundTag tag = new CompoundTag();
-		this.saveAdditional(tag);
+		this.saveAdditional(tag, this.level.registryAccess());
 		return tag;
 	}
 }

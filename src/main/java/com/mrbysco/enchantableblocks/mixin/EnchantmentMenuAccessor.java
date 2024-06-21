@@ -1,5 +1,6 @@
 package com.mrbysco.enchantableblocks.mixin;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
@@ -11,5 +12,5 @@ import java.util.List;
 @Mixin(EnchantmentMenu.class)
 public interface EnchantmentMenuAccessor {
 	@Invoker("getEnchantmentList")
-	List<EnchantmentInstance> invokeGetEnchantmentList(ItemStack stack, int enchantSlot, int level);
+	List<EnchantmentInstance> invokeGetEnchantmentList(RegistryAccess registryAccess, ItemStack stack, int enchantSlot, int level);
 }

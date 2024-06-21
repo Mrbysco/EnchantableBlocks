@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.EnchantTableRenderer;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
+import net.minecraft.world.level.block.entity.EnchantingTableBlockEntity;
 import net.neoforged.neoforge.client.model.data.ModelData;
 
 public class EnchantedEnchantTableRenderer extends EnchantTableRenderer {
@@ -26,7 +26,7 @@ public class EnchantedEnchantTableRenderer extends EnchantTableRenderer {
 	}
 
 	@Override
-	public void render(EnchantmentTableBlockEntity blockEntity, float partialTick, PoseStack poseStack,
+	public void render(EnchantingTableBlockEntity blockEntity, float partialTick, PoseStack poseStack,
 	                   MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
 		super.render(blockEntity, partialTick, poseStack, bufferSource, packedLight, packedOverlay);
 
@@ -38,7 +38,7 @@ public class EnchantedEnchantTableRenderer extends EnchantTableRenderer {
 		if (renderEnchantment) {
 			poseStack.pushPose();
 			PoseStack.Pose pose = poseStack.last();
-			VertexConsumer consumer = new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose.pose(), pose.normal(), 0.0078125F);
+			VertexConsumer consumer = new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose, 0.0078125F);
 			blockRenderDispatcher.renderBatched(
 					blockEntity.getBlockState(),
 					blockEntity.getBlockPos(),

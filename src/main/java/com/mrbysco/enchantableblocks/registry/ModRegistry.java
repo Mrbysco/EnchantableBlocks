@@ -26,7 +26,7 @@ import com.mrbysco.enchantableblocks.block.blockentity.EnchantedChestBlockEntity
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedConduitBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedCraftingTableBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedDispenserBlockEntity;
-import com.mrbysco.enchantableblocks.block.blockentity.EnchantedEnchantmentTableBlockEntity;
+import com.mrbysco.enchantableblocks.block.blockentity.EnchantedEnchantingTableBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedHopperBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedTrappedChestBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.furnace.EnchantedBlastFurnaceBlockEntity;
@@ -114,8 +114,8 @@ public class ModRegistry {
 			BlockEntityType.Builder.of(EnchantedDispenserBlockEntity::new, ENCHANTED_DISPENSER.get()).build(null));
 	public static final Supplier<BlockEntityType<EnchantedHopperBlockEntity>> ENCHANTED_HOPPER_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register("enchanted_hopper", () ->
 			BlockEntityType.Builder.of(EnchantedHopperBlockEntity::new, ENCHANTED_HOPPER.get()).build(null));
-	public static final Supplier<BlockEntityType<EnchantedEnchantmentTableBlockEntity>> ENCHANTED_ENCHANTING_TABLE_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register("enchanted_enchantment_table", () ->
-			BlockEntityType.Builder.of(EnchantedEnchantmentTableBlockEntity::new, ENCHANTED_ENCHANTING_TABLE.get()).build(null));
+	public static final Supplier<BlockEntityType<EnchantedEnchantingTableBlockEntity>> ENCHANTED_ENCHANTING_TABLE_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register("enchanted_enchantment_table", () ->
+			BlockEntityType.Builder.of(EnchantedEnchantingTableBlockEntity::new, ENCHANTED_ENCHANTING_TABLE.get()).build(null));
 	public static final Supplier<BlockEntityType<EnchantedConduitBlockEntity>> ENCHANTED_CONDUIT_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register("enchanted_conduit", () ->
 			BlockEntityType.Builder.of(EnchantedConduitBlockEntity::new, ENCHANTED_CONDUIT.get()).build(null));
 	public static final Supplier<BlockEntityType<EnchantedCraftingTableBlockEntity>> ENCHANTED_CRAFTING_TABLE_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register("enchanted_crafting_table", () ->

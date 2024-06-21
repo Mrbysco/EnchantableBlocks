@@ -3,7 +3,10 @@ package com.mrbysco.enchantableblocks.compat.jade;
 import com.mrbysco.enchantableblocks.EnchantableBlocks;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import snownee.jade.api.BlockAccessor;
@@ -17,6 +20,7 @@ import snownee.jade.api.config.IPluginConfig;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @WailaPlugin
 public class JadeCompat implements IWailaPlugin {
@@ -38,14 +42,15 @@ public class JadeCompat implements IWailaPlugin {
 	}
 
 	public static class EnchantedBlockHandler implements IBlockComponentProvider {
-		private static final ResourceLocation ENCHANTMENTS = new ResourceLocation(EnchantableBlocks.MOD_ID, "enchantments");
+		private static final ResourceLocation ENCHANTMENTS = ResourceLocation.fromNamespaceAndPath(EnchantableBlocks.MOD_ID, "enchantments");
 
 		public static final EnchantedBlockHandler INSTANCE = new EnchantedBlockHandler();
 
 		@Override
 		public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
 			if (blockAccessor.getBlockEntity() instanceof IEnchantable enchantable) {
-				enchantable.getEnchantments().forEach((enchantment, integer) -> iTooltip.add(enchantment.getFullname(integer)));
+				Consumer<Component> consumer = iTooltip::add;
+				enchantable.getEnchantments().addToTooltip(Item.TooltipContext.of(blockAccessor.getLevel()), consumer, TooltipFlag.NORMAL);
 			}
 		}
 

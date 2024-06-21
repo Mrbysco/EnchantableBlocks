@@ -1,31 +1,40 @@
 package com.mrbysco.enchantableblocks.block.blockentity;
 
+import com.mojang.serialization.Dynamic;
+import com.mrbysco.enchantableblocks.mixin.BeehiveBlockEntityAccessor;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import com.mrbysco.enchantableblocks.registry.ModTags;
+import com.mrbysco.enchantableblocks.util.EnchantmentUtil;
 import com.mrbysco.enchantableblocks.util.TagHelper;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.Bee;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Map;
+import net.minecraft.world.level.gameevent.GameEvent;
 
 public class EnchantedBeehiveBlockEntity extends BeehiveBlockEntity implements IEnchantable {
 	protected boolean hideGlint = false;
 	protected ListTag enchantmentTag = null;
-	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
+	protected ItemEnchantments enchantments = ItemEnchantments.EMPTY;
 
 	public EnchantedBeehiveBlockEntity(BlockPos pos, BlockState state) {
 		super(pos, state);
@@ -46,76 +55,90 @@ public class EnchantedBeehiveBlockEntity extends BeehiveBlockEntity implements I
 	}
 
 	@Override
-	public void storeBee(CompoundTag pEntityData, int pTicksInHive, boolean pHasNectar) {
-		int time = pHasNectar ? 2400 : 600;
-		float multiplier = 1;
-		if (hasEnchantment(ModEnchantments.SPEED.get())) {
-			int enchantmentLevel = getEnchantmentLevel(ModEnchantments.SPEED.get());
-			multiplier = 1.0F - (0.1F * enchantmentLevel);
+	public void addOccupant(Entity occupant) {
+		if (!isFull()) {
+			occupant.stopRiding();
+			occupant.ejectPassengers();
+
+			CompoundTag compoundtag = new CompoundTag();
+			occupant.save(compoundtag);
+			BeehiveBlockEntity.IGNORED_BEE_TAGS.forEach(compoundtag::remove);
+			boolean hasNectar = compoundtag.getBoolean("HasNectar");
+			int time = hasNectar ? 2400 : 600;
+			float multiplier = 1;
+			Holder<Enchantment> speedHolder = EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.SPEED);
+			if (hasEnchantment(speedHolder)) {
+				int enchantmentLevel = getEnchantmentLevel(speedHolder);
+				multiplier = 1.0F - (0.1F * enchantmentLevel);
+			}
+			time = (int) (time * multiplier);
+
+			this.storeBee(new BeehiveBlockEntity.Occupant(CustomData.of(compoundtag), 0, time));
+			if (this.level != null) {
+				if (occupant instanceof Bee bee && bee.hasSavedFlowerPos() && (!((BeehiveBlockEntityAccessor) this).invokeHasSavedFlowerPos() || this.level.random.nextBoolean())) {
+					this.savedFlowerPos = bee.getSavedFlowerPos();
+				}
+
+				BlockPos blockpos = this.getBlockPos();
+				this.level
+						.playSound(
+								null,
+								(double) blockpos.getX(),
+								(double) blockpos.getY(),
+								(double) blockpos.getZ(),
+								SoundEvents.BEEHIVE_ENTER,
+								SoundSource.BLOCKS,
+								1.0F,
+								1.0F
+						);
+				this.level.gameEvent(GameEvent.BLOCK_CHANGE, blockpos, GameEvent.Context.of(occupant, this.getBlockState()));
+			}
+
+			occupant.discard();
+			super.setChanged();
 		}
-		time = (int) (time * multiplier);
-		this.stored.add(new BeehiveBlockEntity.BeeData(pEntityData, pTicksInHive, time));
 	}
 
 	@Override
-	public Map<Enchantment, Integer> getEnchantments() {
+	public ItemEnchantments getEnchantments() {
 		return enchantments;
 	}
 
 	@Override
-	public boolean hasEnchantment(Enchantment enchantment) {
-		return this.enchantments.containsKey(enchantment);
+	public boolean hasEnchantment(Holder<Enchantment> enchantment) {
+		return this.enchantments.getLevel(enchantment) > 0;
 	}
 
 	@Override
-	public int getEnchantmentLevel(Enchantment enchantment) {
+	public int getEnchantmentLevel(Holder<Enchantment> enchantment) {
 		if (this.hasEnchantment(enchantment))
-			return this.enchantments.get(enchantment);
+			return this.enchantments.getLevel(enchantment);
 		return -1;
 	}
 
 	@Override
 	public boolean hasEnchantment(TagKey<Enchantment> enchantmentTag) {
-		for (Enchantment enchantment : this.enchantments.keySet()) {
-			if (TagHelper.matchesTag(enchantment, enchantmentTag)) {
+		for (Holder<Enchantment> enchantment : this.enchantments.keySet()) {
+			if (TagHelper.matchesTag(this.level.registryAccess(), enchantment, enchantmentTag)) {
 				return true;
 			}
 		}
-		return this.enchantments.containsKey(enchantmentTag);
+		return false;
 	}
 
 	@Override
 	public int getEnchantmentLevel(TagKey<Enchantment> enchantmentTag) {
-		for (Enchantment enchantment : this.enchantments.keySet()) {
-			if (TagHelper.matchesTag(enchantment, enchantmentTag)) {
-				return this.enchantments.get(enchantment);
+		for (Holder<Enchantment> enchantment : this.enchantments.keySet()) {
+			if (TagHelper.matchesTag(this.level.registryAccess(), enchantment, enchantmentTag)) {
+				return this.enchantments.getLevel(enchantment);
 			}
 		}
 		return -1;
 	}
 
 	@Override
-	public void setEnchantments(ListTag enchantmentTags) {
-		this.enchantmentTag = enchantmentTags;
-		this.updateEnchantmentMap();
-	}
-
-	@Override
-	public ListTag getEnchantmentsTag() {
-		return this.enchantmentTag;
-	}
-
-	@Override
-	public void updateEnchantmentMap() {
-		this.enchantments.clear();
-		if (this.enchantmentTag != null) {
-			EnchantmentHelper.deserializeEnchantments(this.enchantmentTag).forEach((enchantment, integer) -> {
-				if (enchantment != null) {
-					this.enchantments.put(enchantment, integer);
-				}
-			});
-			this.hideGlint = this.hasEnchantment(ModEnchantments.GLINTLESS.get());
-		}
+	public void setEnchantments(ItemEnchantments enchantments) {
+		this.enchantments = enchantments;
 	}
 
 	@Override
@@ -124,19 +147,47 @@ public class EnchantedBeehiveBlockEntity extends BeehiveBlockEntity implements I
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
 		if (tag.contains("Enchantments")) {
-			this.enchantmentTag = tag.getList("Enchantments", Tag.TAG_COMPOUND);
-			this.updateEnchantmentMap();
+			ItemEnchantments.CODEC
+					.parse(new Dynamic<>(NbtOps.INSTANCE, tag.get("Enchantments")))
+					.resultOrPartial()
+					.ifPresent(enchantments -> this.enchantments = enchantments);
+			this.enchantments = ItemEnchantments.CODEC.parse(NbtOps.INSTANCE, tag.get("Enchantments")).result().orElse(null);
 		}
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
-		if (this.enchantmentTag != null)
-			tag.put("Enchantments", enchantmentTag);
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
+		if (this.enchantments != null) {
+			ItemEnchantments.CODEC
+					.encodeStart(NbtOps.INSTANCE, this.enchantments)
+					.resultOrPartial()
+					.ifPresent(enchantments -> tag.put("Enchantments", enchantments));
+		}
+	}
+
+	@Override
+	protected void applyImplicitComponents(DataComponentInput componentInput) {
+		super.applyImplicitComponents(componentInput);
+		ItemEnchantments enchantments = componentInput.get(DataComponents.ENCHANTMENTS);
+		if (enchantments != null) {
+			this.enchantments = enchantments;
+		}
+	}
+
+	@Override
+	protected void collectImplicitComponents(DataComponentMap.Builder pComponents) {
+		super.collectImplicitComponents(pComponents);
+		pComponents.set(DataComponents.ENCHANTMENTS, this.getEnchantments());
+	}
+
+	@Override
+	public void removeComponentsFromTag(CompoundTag tag) {
+		super.removeComponentsFromTag(tag);
+
 	}
 
 	//Sync stuff
@@ -146,10 +197,10 @@ public class EnchantedBeehiveBlockEntity extends BeehiveBlockEntity implements I
 	}
 
 	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
 		var tag = packet.getTag();
 		if (tag != null) {
-			handleUpdateTag(tag);
+			handleUpdateTag(tag, registries);
 
 			BlockState state = level.getBlockState(worldPosition);
 			level.sendBlockUpdated(worldPosition, state, state, 3);
@@ -166,19 +217,19 @@ public class EnchantedBeehiveBlockEntity extends BeehiveBlockEntity implements I
 	}
 
 	@Override
-	public CompoundTag getUpdateTag() {
-		return saveWithoutMetadata();
+	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+		return saveWithoutMetadata(registries);
 	}
 
 	@Override
-	public void handleUpdateTag(CompoundTag tag) {
-		load(tag);
+	public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+		loadAdditional(tag, registries);
 	}
 
 	@Override
 	public CompoundTag getPersistentData() {
 		CompoundTag tag = new CompoundTag();
-		this.saveAdditional(tag);
+		this.saveAdditional(tag, this.level.registryAccess());
 		return tag;
 	}
 

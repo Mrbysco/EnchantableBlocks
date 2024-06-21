@@ -70,7 +70,7 @@ public class EnchantedBedRenderer extends BedRenderer {
 		if (renderEnchantment) {
 			PoseStack.Pose pose = poseStack.last();
 			vertexconsumer = VertexMultiConsumer.create(
-					new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose.pose(), pose.normal(), 0.0078125F),
+					new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose, 0.0078125F),
 					material.buffer(bufferSource, RenderType::entitySolid));
 		} else {
 			vertexconsumer = material.buffer(bufferSource, RenderType::entitySolid);

@@ -1,23 +1,18 @@
 package com.mrbysco.enchantableblocks.block.blockentity;
 
-import net.minecraft.nbt.ListTag;
+import net.minecraft.core.Holder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.enchantment.Enchantment;
-
-import java.util.Map;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 public interface IEnchantable {
-	Map<Enchantment, Integer> getEnchantments();
+	ItemEnchantments getEnchantments();
 
-	ListTag getEnchantmentsTag();
+	void setEnchantments(ItemEnchantments enchantments);
 
-	void setEnchantments(ListTag enchantmentTags);
+	boolean hasEnchantment(Holder<Enchantment> enchantment);
 
-	void updateEnchantmentMap();
-
-	boolean hasEnchantment(Enchantment enchantment);
-
-	int getEnchantmentLevel(Enchantment enchantment);
+	int getEnchantmentLevel(Holder<Enchantment> enchantment);
 
 	boolean hasEnchantment(TagKey<Enchantment> enchantmentTag);
 

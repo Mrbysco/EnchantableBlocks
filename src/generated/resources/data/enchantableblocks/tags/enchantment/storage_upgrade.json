@@ -1,9 +1,0 @@
-{
-  "values": [
-    "enchantableblocks:storing",
-    {
-      "id": "cofh_core:holding",
-      "required": false
-    }
-  ]
-}

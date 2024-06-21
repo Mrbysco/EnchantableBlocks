@@ -3,9 +3,7 @@ package com.mrbysco.enchantableblocks.mixin;
 import com.mrbysco.enchantableblocks.util.ReplacementUtil;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,13 +34,5 @@ public abstract class BlockItemMixin extends Item {
 				cir.setReturnValue(state);
 			}
 		}
-	}
-
-	@Override
-	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-		if (stack.getItem() instanceof BlockItem && ReplacementUtil.isEnchantmentApplicable(enchantment, stack)) {
-			return true;
-		}
-		return super.canApplyAtEnchantingTable(stack, enchantment);
 	}
 }

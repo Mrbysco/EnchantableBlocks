@@ -1,0 +1,20 @@
+{
+  "anvil_cost": 4,
+  "description": {
+    "translate": "enchantment.enchantableblocks.intentional_game_design"
+  },
+  "max_cost": {
+    "base": 10,
+    "per_level_above_first": 40
+  },
+  "max_level": 2,
+  "min_cost": {
+    "base": 10,
+    "per_level_above_first": 0
+  },
+  "slots": [
+    "any"
+  ],
+  "supported_items": "#enchantableblocks:intentional_game_design_enchantable",
+  "weight": 2
+}

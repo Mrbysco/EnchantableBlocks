@@ -3,18 +3,22 @@ package com.mrbysco.enchantableblocks.menu;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.mixin.EnchantmentMenuAccessor;
 import com.mrbysco.enchantableblocks.registry.ModMenus;
+import com.mrbysco.enchantableblocks.util.EnchantmentUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Holder;
+import net.minecraft.core.IdMap;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.block.EnchantmentTableBlock;
+import net.minecraft.world.level.block.EnchantingTableBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.event.EventHooks;
 
@@ -40,15 +44,17 @@ public class EnchantedEnchantmentMenu extends EnchantmentMenu {
 			ItemStack itemstack = pInventory.getItem(0);
 			if (!itemstack.isEmpty() && itemstack.isEnchantable()) {
 				this.access.execute((level, pos) -> {
+					IdMap<Holder<Enchantment>> idmap = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).asHolderIdMap();
 					float j = 0;
 					float powerMultiplier = 1.0F;
 					BlockEntity blockEntity = level.getBlockEntity(pos);
-					if (blockEntity instanceof IEnchantable enchantable && enchantable.hasEnchantment(Enchantments.BLOCK_EFFICIENCY)) {
-						powerMultiplier = 1.0F + (float) enchantable.getEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY) * 0.5F;
+					Holder<Enchantment> efficiencyHolder = EnchantmentUtil.getEnchantmentHolder(blockEntity.getLevel(), Enchantments.EFFICIENCY);
+					if (blockEntity instanceof IEnchantable enchantable && enchantable.hasEnchantment(efficiencyHolder)) {
+						powerMultiplier = 1.0F + (float) enchantable.getEnchantmentLevel(efficiencyHolder) * 0.5F;
 					}
 
-					for (BlockPos blockpos : EnchantmentTableBlock.BOOKSHELF_OFFSETS) {
-						if (EnchantmentTableBlock.isValidBookShelf(level, pos, blockpos)) {
+					for (BlockPos blockpos : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
+						if (EnchantingTableBlock.isValidBookShelf(level, pos, blockpos)) {
 							j += (level.getBlockState(pos.offset(blockpos)).getEnchantPowerBonus(level, pos.offset(blockpos)) * powerMultiplier);
 						}
 					}
@@ -67,10 +73,10 @@ public class EnchantedEnchantmentMenu extends EnchantmentMenu {
 
 					for (int l = 0; l < 3; ++l) {
 						if (this.costs[l] > 0) {
-							List<EnchantmentInstance> list = ((EnchantmentMenuAccessor) this).invokeGetEnchantmentList(itemstack, l, this.costs[l]);
+							List<EnchantmentInstance> list = ((EnchantmentMenuAccessor) this).invokeGetEnchantmentList(level.registryAccess(), itemstack, l, this.costs[l]);
 							if (list != null && !list.isEmpty()) {
 								EnchantmentInstance enchantmentinstance = list.get(this.random.nextInt(list.size()));
-								this.enchantClue[l] = BuiltInRegistries.ENCHANTMENT.getId(enchantmentinstance.enchantment);
+								this.enchantClue[l] = idmap.getId(enchantmentinstance.enchantment);
 								this.levelClue[l] = enchantmentinstance.level;
 							}
 						}

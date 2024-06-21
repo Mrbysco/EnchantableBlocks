@@ -94,7 +94,7 @@
 //	public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
 //		BlockEntity blockentity = params.getParameter(LootContextParams.BLOCK_ENTITY);
 //		if (blockentity instanceof IEnchantable enchantable) {
-//			if (enchantable.hasEnchantment(Enchantments.VANISHING_CURSE)) {
+//			if (enchantable.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(blockentity, Enchantments.VANISHING_CURSE))) {
 //				return List.of();
 //			}
 //		}

@@ -1,33 +1,37 @@
 package com.mrbysco.enchantableblocks.block.blockentity.furnace;
 
+import com.mojang.serialization.Dynamic;
+import com.mrbysco.enchantableblocks.EnchantableBlocks;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.mixin.AbstractFurnaceBlockEntityAccessor;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModTags;
+import com.mrbysco.enchantableblocks.util.EnchantmentUtil;
 import com.mrbysco.enchantableblocks.util.TagHelper;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
-import net.minecraft.world.Container;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.Blocks;
@@ -40,27 +44,27 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-
 public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnaceBlockEntity implements IEnchantable {
 	protected boolean hideGlint = false;
 	protected ListTag enchantmentTag = null;
-	protected final Object2IntMap<Enchantment> enchantments = new Object2IntOpenHashMap<>();
+	protected ItemEnchantments enchantments = ItemEnchantments.EMPTY;
 
-	protected AbstractEnchantedFurnaceBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state,
-	                                              RecipeType<? extends AbstractCookingRecipe> recipeType) {
+	protected AbstractEnchantedFurnaceBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state, RecipeType<? extends AbstractCookingRecipe> recipeType) {
 		super(blockEntityType, pos, state, recipeType);
 	}
 
 	public static void serverTick(Level level, BlockPos pos, BlockState state, AbstractEnchantedFurnaceBlockEntity blockEntity) {
 		AbstractFurnaceBlockEntityAccessor blockEntityAccessor = (AbstractFurnaceBlockEntityAccessor) blockEntity;
-		final RecipeManager.CachedCheck<Container, ? extends AbstractCookingRecipe> quickCheck = blockEntityAccessor.getQuickCheck();
+		final RecipeManager.CachedCheck<SingleRecipeInput, ? extends AbstractCookingRecipe> quickCheck = blockEntityAccessor.getQuickCheck();
 		boolean wasLit = blockEntity.isLit();
 		boolean changed = false;
-		boolean hasInput = !blockEntity.items.get(0).isEmpty();
-		boolean solar = blockEntity.hasEnchantment(ModEnchantments.SOLAR_RADIANCE.get());
+		boolean hasInput = !blockEntity.items.getFirst().isEmpty();
+		boolean solar = blockEntity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.SOLAR_RADIANCE));
 		boolean solarRequirements = level.isDay() && level.canSeeSky(pos.above());
 
+		if (hasInput) {
+			EnchantableBlocks.LOGGER.info("{}", blockEntity.items.getFirst().getComponents().keySet());
+		}
 		if (blockEntity.isLit()) {
 			int speed = blockEntity.getSpeed();
 			if (solar) {
@@ -70,11 +74,11 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 					blockEntity.litTime -= speed;
 				}
 			} else {
-				boolean preservation = blockEntity.hasEnchantment(ModEnchantments.PRESERVATION.get());
+				boolean preservation = blockEntity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.PRESERVATION));
 				if (preservation) {
-					RecipeHolder<?> recipe = hasInput ? quickCheck.getRecipeFor(blockEntity, level).orElse(null) : null;
-					if (recipe != null)
-						blockEntity.litTime -= speed;
+					SingleRecipeInput singlerecipeinput = new SingleRecipeInput(blockEntity.getItem(0));
+					RecipeHolder<?> recipe = hasInput ? quickCheck.getRecipeFor(singlerecipeinput, level).orElse(null) : null;
+					if (recipe != null) blockEntity.litTime -= speed;
 
 				} else {
 					blockEntity.litTime -= speed;
@@ -85,19 +89,19 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		ItemStack fuel = blockEntity.items.get(1);
 		boolean hasFuel = !fuel.isEmpty();
 		if (blockEntity.isLit() || ((solar && solarRequirements) || hasFuel) && hasInput) {
-			RecipeHolder<?> recipe = hasInput ? quickCheck.getRecipeFor(blockEntity, level).orElse(null) : null;
+			SingleRecipeInput singlerecipeinput = new SingleRecipeInput(blockEntity.getItem(0));
+			RecipeHolder<?> recipe = hasInput ? quickCheck.getRecipeFor(singlerecipeinput, level).orElse(null) : null;
 			int i = blockEntity.getMaxStackSize();
 			if (!blockEntity.isLit()) {
 				if (solar && solarRequirements) {
 					blockEntity.litTime = 200;
 					blockEntity.litDuration = blockEntity.litTime;
-				} else if (blockEntityAccessor.invokeCanBurn(level.registryAccess(), recipe, blockEntity.items, i)) {
+				} else if (canBurn(level.registryAccess(), recipe, blockEntity.items, i, blockEntity)) {
 					blockEntity.litTime = blockEntity.getBurnDuration(fuel);
 					blockEntity.litDuration = blockEntity.litTime;
 					if (blockEntity.isLit()) {
 						changed = true;
-						if (fuel.hasCraftingRemainingItem())
-							blockEntity.items.set(1, fuel.getCraftingRemainingItem());
+						if (fuel.hasCraftingRemainingItem()) blockEntity.items.set(1, fuel.getCraftingRemainingItem());
 						else if (hasFuel) {
 							fuel.shrink(1);
 							if (fuel.isEmpty()) {
@@ -108,13 +112,13 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 				}
 			}
 
-			if (blockEntity.isLit() && blockEntityAccessor.invokeCanBurn(level.registryAccess(), recipe, blockEntity.items, i)) {
+			if (blockEntity.isLit() && canBurn(level.registryAccess(), recipe, blockEntity.items, i, blockEntity)) {
 				int speed = blockEntity.getSpeed();
 				blockEntity.cookingProgress += speed;
 				if (blockEntity.cookingProgress >= blockEntity.cookingTotalTime) {
 					blockEntity.cookingProgress = 0;
 					blockEntity.cookingTotalTime = getTotalCookTime(level, blockEntity);
-					if (blockEntity.enchantedBurn(level.registryAccess(), recipe, blockEntity.items, i)) {
+					if (blockEntity.enchantedBurn(level.registryAccess(), recipe, blockEntity.items, i, blockEntity)) {
 						blockEntity.setRecipeUsed(recipe);
 					}
 
@@ -138,10 +142,32 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		}
 	}
 
+	private static boolean canBurn(RegistryAccess pRegistryAccess, @javax.annotation.Nullable RecipeHolder<?> pRecipe, NonNullList<ItemStack> pInventory, int pMaxStackSize, AbstractEnchantedFurnaceBlockEntity furnace) {
+		if (!pInventory.get(0).isEmpty() && pRecipe != null) {
+			ItemStack itemstack = ((RecipeHolder<? extends AbstractCookingRecipe>) pRecipe).value().assemble(new SingleRecipeInput(furnace.getItem(0)), pRegistryAccess);
+			if (itemstack.isEmpty()) {
+				return false;
+			} else {
+				ItemStack itemstack1 = pInventory.get(2);
+				if (itemstack1.isEmpty()) {
+					return true;
+				} else if (!ItemStack.isSameItemSameComponents(itemstack1, itemstack)) {
+					return false;
+				} else {
+					return itemstack1.getCount() + itemstack.getCount() <= pMaxStackSize && itemstack1.getCount() + itemstack.getCount() <= itemstack1.getMaxStackSize() // Neo fix: make furnace respect stack sizes in furnace recipes
+							? true : itemstack1.getCount() + itemstack.getCount() <= itemstack.getMaxStackSize(); // Neo fix: make furnace respect stack sizes in furnace recipes
+				}
+			}
+		} else {
+			return false;
+		}
+	}
+
 	private int getSpeed() {
 		int speed = 1;
-		if (hasEnchantment(ModEnchantments.SPEED.get())) {
-			int enchantmentLevel = getEnchantmentLevel(ModEnchantments.SPEED.get());
+		Holder<Enchantment> speedHolder = EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.SPEED);
+		if (hasEnchantment(speedHolder)) {
+			int enchantmentLevel = getEnchantmentLevel(speedHolder);
 			//Adjust the speed based on the level of the enchantment
 			speed += enchantmentLevel;
 		}
@@ -149,19 +175,20 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 	}
 
 	@SuppressWarnings("unchecked")
-	private boolean enchantedBurn(RegistryAccess registryAccess, @Nullable RecipeHolder<?> recipeHolder, NonNullList<ItemStack> inventory, int maxStackSize) {
-		if (recipeHolder != null && ((AbstractFurnaceBlockEntityAccessor) this).invokeCanBurn(registryAccess, recipeHolder, inventory, maxStackSize)) {
-			ItemStack inputStack = inventory.get(0);
-			ItemStack craftedStack = ((RecipeHolder<net.minecraft.world.item.crafting.Recipe<WorldlyContainer>>) recipeHolder).value().assemble(this, registryAccess);
-			if (hasEnchantment(ModEnchantments.YIELD.get()) && craftedStack.getCount() < craftedStack.getMaxStackSize() && !craftedStack.is(ModTags.Items.YIELD_BLACKLIST)) {
-				int enchantmentLevel = getEnchantmentLevel(ModEnchantments.YIELD.get());
+	private boolean enchantedBurn(RegistryAccess registryAccess, @Nullable RecipeHolder<?> recipeHolder, NonNullList<ItemStack> inventory, int maxStackSize, AbstractEnchantedFurnaceBlockEntity furnace) {
+		if (recipeHolder != null && canBurn(registryAccess, recipeHolder, inventory, maxStackSize, furnace)) {
+			ItemStack inputStack = inventory.getFirst();
+			ItemStack craftedStack = ((RecipeHolder<? extends AbstractCookingRecipe>) recipeHolder).value().assemble(new SingleRecipeInput(furnace.getItem(0)), registryAccess);
+			Holder<Enchantment> yieldHolder = EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.YIELD);
+			if (hasEnchantment(yieldHolder) && craftedStack.getCount() < craftedStack.getMaxStackSize() && !craftedStack.is(ModTags.Items.YIELD_BLACKLIST)) {
+				int enchantmentLevel = getEnchantmentLevel(yieldHolder);
 				//Adjust the craftedStack based on the level of the enchantment
 				int count = 1 + enchantmentLevel;
 				craftedStack.setCount(Mth.clamp(count, 1, craftedStack.getMaxStackSize()));
 			}
 
 			ItemStack resultStack = inventory.get(2);
-			if (hasEnchantment(ModEnchantments.EXPORTING.get()) && this.getBlockState() != null) {
+			if (hasEnchantment(EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.EXPORTING)) && this.getBlockState() != null) {
 				Direction direction = this.getBlockState().getValue(AbstractFurnaceBlock.FACING);
 				BlockPos leftPos = this.getBlockPos().relative(direction.getClockWise());
 				BlockPos rightPos = this.getBlockPos().relative(direction.getCounterClockWise());
@@ -204,10 +231,11 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 
 	private static int getTotalCookTime(Level level, AbstractEnchantedFurnaceBlockEntity blockEntity) {
 		AbstractFurnaceBlockEntityAccessor blockEntityAccessor = (AbstractFurnaceBlockEntityAccessor) blockEntity;
-		int cookTime = blockEntityAccessor.getQuickCheck().getRecipeFor(blockEntity, level)
-				.map(recipeHolder -> recipeHolder.value().getCookingTime()).orElse(200);
-		if (blockEntity.hasEnchantment(ModEnchantments.SPEED.get())) {
-			int enchantmentLevel = blockEntity.getEnchantmentLevel(ModEnchantments.SPEED.get());
+		SingleRecipeInput singlerecipeinput = new SingleRecipeInput(blockEntity.getItem(0));
+		int cookTime = blockEntityAccessor.getQuickCheck().getRecipeFor(singlerecipeinput, level).map(recipeHolder -> recipeHolder.value().getCookingTime()).orElse(200);
+		Holder<Enchantment> speedHolder = EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.SPEED);
+		if (blockEntity.hasEnchantment(speedHolder)) {
+			int enchantmentLevel = blockEntity.getEnchantmentLevel(speedHolder);
 			//Adjust the cookTime based on the level of the enchantment
 		}
 		return cookTime;
@@ -216,8 +244,9 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 	@Override
 	protected int getBurnDuration(ItemStack fuel) {
 		int burnDuration = super.getBurnDuration(fuel);
-		if (burnDuration != 0 && this.hasEnchantment(ModEnchantments.FUEL_EFFICIENCY.get())) {
-			int enchantmentLevel = this.getEnchantmentLevel(ModEnchantments.FUEL_EFFICIENCY.get());
+		Holder<Enchantment> FuelEfficiencyHolder = EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.BLOCK_EFFICIENCY);
+		if (burnDuration != 0 && this.hasEnchantment(FuelEfficiencyHolder)) {
+			int enchantmentLevel = this.getEnchantmentLevel(FuelEfficiencyHolder);
 			//Adjust the burnDuration based on the level of the enchantment
 			burnDuration = Mth.ceil(burnDuration * (1F + (enchantmentLevel * 0.2F)));
 		}
@@ -229,64 +258,44 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 	}
 
 	@Override
-	public Map<Enchantment, Integer> getEnchantments() {
+	public ItemEnchantments getEnchantments() {
 		return enchantments;
 	}
 
 	@Override
-	public boolean hasEnchantment(Enchantment enchantment) {
-		return this.enchantments.containsKey(enchantment);
+	public boolean hasEnchantment(Holder<Enchantment> enchantment) {
+		return this.enchantments.getLevel(enchantment) > 0;
 	}
 
 	@Override
-	public int getEnchantmentLevel(Enchantment enchantment) {
-		if (this.hasEnchantment(enchantment))
-			return this.enchantments.get(enchantment);
+	public int getEnchantmentLevel(Holder<Enchantment> enchantment) {
+		if (this.hasEnchantment(enchantment)) return this.enchantments.getLevel(enchantment);
 		return -1;
 	}
 
 	@Override
 	public boolean hasEnchantment(TagKey<Enchantment> enchantmentTag) {
-		for (Enchantment enchantment : this.enchantments.keySet()) {
-			if (TagHelper.matchesTag(enchantment, enchantmentTag)) {
+		for (Holder<Enchantment> enchantment : this.enchantments.keySet()) {
+			if (TagHelper.matchesTag(this.level.registryAccess(), enchantment, enchantmentTag)) {
 				return true;
 			}
 		}
-		return this.enchantments.containsKey(enchantmentTag);
+		return false;
 	}
 
 	@Override
 	public int getEnchantmentLevel(TagKey<Enchantment> enchantmentTag) {
-		for (Enchantment enchantment : this.enchantments.keySet()) {
-			if (TagHelper.matchesTag(enchantment, enchantmentTag)) {
-				return this.enchantments.get(enchantment);
+		for (Holder<Enchantment> enchantment : this.enchantments.keySet()) {
+			if (TagHelper.matchesTag(this.level.registryAccess(), enchantment, enchantmentTag)) {
+				return this.enchantments.getLevel(enchantment);
 			}
 		}
 		return -1;
 	}
 
 	@Override
-	public void setEnchantments(ListTag enchantmentTags) {
-		this.enchantmentTag = enchantmentTags;
-		this.updateEnchantmentMap();
-	}
-
-	@Override
-	public ListTag getEnchantmentsTag() {
-		return this.enchantmentTag;
-	}
-
-	@Override
-	public void updateEnchantmentMap() {
-		this.enchantments.clear();
-		if (this.enchantmentTag != null) {
-			EnchantmentHelper.deserializeEnchantments(this.enchantmentTag).forEach((enchantment, integer) -> {
-				if (enchantment != null) {
-					this.enchantments.put(enchantment, integer);
-				}
-			});
-			this.hideGlint = this.hasEnchantment(ModEnchantments.GLINTLESS.get());
-		}
+	public void setEnchantments(ItemEnchantments enchantments) {
+		this.enchantments = enchantments;
 	}
 
 	@Override
@@ -295,19 +304,40 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
 		if (tag.contains("Enchantments")) {
-			this.enchantmentTag = tag.getList("Enchantments", Tag.TAG_COMPOUND);
-			this.updateEnchantmentMap();
+			ItemEnchantments.CODEC.parse(new Dynamic<>(NbtOps.INSTANCE, tag.get("Enchantments"))).resultOrPartial().ifPresent(enchantments -> this.enchantments = enchantments);
+			this.enchantments = ItemEnchantments.CODEC.parse(NbtOps.INSTANCE, tag.get("Enchantments")).result().orElse(null);
 		}
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
-		if (this.enchantmentTag != null)
-			tag.put("Enchantments", enchantmentTag);
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
+		if (this.enchantments != null) {
+			ItemEnchantments.CODEC.encodeStart(NbtOps.INSTANCE, this.enchantments).resultOrPartial().ifPresent(enchantments -> tag.put("Enchantments", enchantments));
+		}
+	}
+
+	@Override
+	protected void applyImplicitComponents(DataComponentInput componentInput) {
+		super.applyImplicitComponents(componentInput);
+		ItemEnchantments enchantments = componentInput.get(DataComponents.ENCHANTMENTS);
+		if (enchantments != null) {
+			this.enchantments = enchantments;
+		}
+	}
+
+	@Override
+	protected void collectImplicitComponents(DataComponentMap.Builder pComponents) {
+		super.collectImplicitComponents(pComponents);
+		pComponents.set(DataComponents.ENCHANTMENTS, this.getEnchantments());
+	}
+
+	@Override
+	public void removeComponentsFromTag(CompoundTag tag) {
+		super.removeComponentsFromTag(tag);
 	}
 
 	//Sync stuff
@@ -317,10 +347,10 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 	}
 
 	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
 		var tag = packet.getTag();
 		if (tag != null) {
-			handleUpdateTag(tag);
+			handleUpdateTag(tag, registries);
 
 			BlockState state = level.getBlockState(worldPosition);
 			level.sendBlockUpdated(worldPosition, state, state, 3);
@@ -337,19 +367,19 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 	}
 
 	@Override
-	public CompoundTag getUpdateTag() {
-		return saveWithoutMetadata();
+	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+		return saveWithoutMetadata(registries);
 	}
 
 	@Override
-	public void handleUpdateTag(CompoundTag tag) {
-		load(tag);
+	public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+		loadAdditional(tag, registries);
 	}
 
 	@Override
 	public CompoundTag getPersistentData() {
 		CompoundTag tag = new CompoundTag();
-		this.saveAdditional(tag);
+		this.saveAdditional(tag, this.level.registryAccess());
 		return tag;
 	}
 }

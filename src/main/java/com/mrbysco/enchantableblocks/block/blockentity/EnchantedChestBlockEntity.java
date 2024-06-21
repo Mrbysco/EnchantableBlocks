@@ -3,8 +3,10 @@ package com.mrbysco.enchantableblocks.block.blockentity;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import com.mrbysco.enchantableblocks.registry.ModTags;
+import com.mrbysco.enchantableblocks.util.EnchantmentUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -111,23 +113,23 @@ public class EnchantedChestBlockEntity extends AbstractEnchantedBlockEntity impl
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
 		if (tag.contains("CustomName", 8)) {
-			this.name = Component.Serializer.fromJson(tag.getString("CustomName"));
+			this.name = parseCustomNameSafe(tag.getString("CustomName"), registries);
 		}
 
-		this.handler.deserializeNBT(tag.getCompound("Items"));
+		this.handler.deserializeNBT(registries, tag.getCompound("Items"));
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
 		if (this.name != null) {
-			tag.putString("CustomName", Component.Serializer.toJson(this.name));
+			tag.putString("CustomName", Component.Serializer.toJson(this.name, registries));
 		}
 
-		tag.put("Items", handler.serializeNBT());
+		tag.put("Items", handler.serializeNBT(registries));
 	}
 
 	public void setCustomName(Component pName) {
@@ -255,7 +257,7 @@ public class EnchantedChestBlockEntity extends AbstractEnchantedBlockEntity impl
 	}
 
 	private boolean isWithinRange(int slot) {
-		int storingLevel = getEnchantmentLevel(ModEnchantments.STORING.get());
+		int storingLevel = getEnchantmentLevel(EnchantmentUtil.getEnchantmentHolder(this, ModEnchantments.STORING));
 		if (storingLevel < 1) {
 			return slot < 27;
 		} else if (storingLevel == 1) {

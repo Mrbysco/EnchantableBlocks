@@ -1,9 +1,5 @@
 package com.mrbysco.enchantableblocks.util;
 
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 
 import java.util.HashMap;
@@ -24,22 +20,11 @@ public class ReplacementUtil {
 		return replacementMap.containsKey(block);
 	}
 
-	public static boolean isEnchantmentApplicable(Enchantment enchantment, ItemStack stack) {
-		if (stack.getItem() instanceof BlockItem blockItem) {
-			Block block = blockItem.getBlock();
-			if (replacementMap.containsKey(block)) {
-				return replacementMap.get(block).matchesTag(enchantment);
-			}
-		}
-
-		return false;
-	}
-
 	public static void addReplacement(BlockReplacement replacement) {
 		replacementMap.put(replacement.originalBlock(), replacement);
 	}
 
-	public static void addReplacement(Block block, Supplier<? extends Block> replacement, TagKey<Enchantment> enchantmentTag) {
-		replacementMap.put(block, new BlockReplacement(block, replacement, enchantmentTag));
+	public static void addReplacement(Block block, Supplier<? extends Block> replacement) {
+		replacementMap.put(block, new BlockReplacement(block, replacement));
 	}
 }

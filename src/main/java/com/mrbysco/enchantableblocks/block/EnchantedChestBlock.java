@@ -6,19 +6,19 @@ import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModMenus;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
+import com.mrbysco.enchantableblocks.util.EnchantmentUtil;
 import com.mrbysco.enchantableblocks.util.MiscHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
@@ -26,15 +26,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.AbstractChestBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoubleBlockCombiner;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.Mirror;
@@ -115,13 +114,13 @@ public class EnchantedChestBlock extends AbstractChestBlock<EnchantedChestBlockE
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
+	protected InteractionResult useWithoutItem(BlockState pState, Level level, BlockPos pos, Player player, BlockHitResult pHitResult) {
 		if (level.isClientSide) {
 			return InteractionResult.SUCCESS;
 		} else {
 			BlockEntity blockentity = level.getBlockEntity(pos);
 			if (blockentity instanceof EnchantedChestBlockEntity chestBlockEntity) {
-				int enchantmentLevel = chestBlockEntity.getEnchantmentLevel(ModEnchantments.STORING.get());
+				int enchantmentLevel = chestBlockEntity.getEnchantmentLevel(EnchantmentUtil.getEnchantmentHolder(blockentity, ModEnchantments.STORING));
 				if (enchantmentLevel < 1) {
 					player.openMenu(new SimpleMenuProvider((theContainerID, theInventory, thePlayer) ->
 							ChestMenu.threeRows(theContainerID, theInventory, chestBlockEntity), CONTAINER_TITLE));
@@ -184,7 +183,7 @@ public class EnchantedChestBlock extends AbstractChestBlock<EnchantedChestBlockE
 	}
 
 	@Override
-	public boolean isPathfindable(BlockState state, BlockGetter plevel, BlockPos pos, PathComputationType type) {
+	protected boolean isPathfindable(BlockState pState, PathComputationType pPathComputationType) {
 		return false;
 	}
 
@@ -202,21 +201,13 @@ public class EnchantedChestBlock extends AbstractChestBlock<EnchantedChestBlockE
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
-		ItemStack originalStack = new ItemStack(Blocks.CHEST);
-		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity && blockEntity.getEnchantmentsTag() != null) {
-			originalStack.getOrCreateTag().put("Enchantments", blockEntity.getEnchantmentsTag());
-		}
-		return originalStack;
-	}
-
-	@Override
 	public float getExplosionResistance(BlockState state, BlockGetter level, BlockPos pos, Explosion explosion) {
 		float explosionResistance = super.getExplosionResistance(state, level, pos, explosion);
 		BlockEntity blockentity = level.getBlockEntity(pos);
 		if (blockentity instanceof IEnchantable enchantable) {
-			if (enchantable.hasEnchantment(Enchantments.BLAST_PROTECTION)) {
-				int enchantmentLevel = enchantable.getEnchantmentLevel(Enchantments.BLAST_PROTECTION);
+			Holder<Enchantment> blastHolder = EnchantmentUtil.getEnchantmentHolder(blockentity, Enchantments.BLAST_PROTECTION);
+			if (enchantable.hasEnchantment(blastHolder)) {
+				int enchantmentLevel = enchantable.getEnchantmentLevel(blastHolder);
 				explosionResistance *= ((enchantmentLevel + 1) * 30);
 			}
 		}
@@ -227,7 +218,7 @@ public class EnchantedChestBlock extends AbstractChestBlock<EnchantedChestBlockE
 	public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
 		BlockEntity blockentity = params.getParameter(LootContextParams.BLOCK_ENTITY);
 		if (blockentity instanceof IEnchantable enchantable) {
-			if (enchantable.hasEnchantment(Enchantments.VANISHING_CURSE)) {
+			if (enchantable.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(blockentity, Enchantments.VANISHING_CURSE))) {
 				return List.of();
 			}
 		}
@@ -240,7 +231,7 @@ public class EnchantedChestBlock extends AbstractChestBlock<EnchantedChestBlockE
 			BlockEntity blockentity = level.getBlockEntity(pos);
 			if (blockentity instanceof EnchantedChestBlockEntity craftingTableBlockEntity) {
 				if (level instanceof ServerLevel) {
-					if (!craftingTableBlockEntity.hasEnchantment(Enchantments.VANISHING_CURSE)) {
+					if (!craftingTableBlockEntity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(blockentity, Enchantments.VANISHING_CURSE))) {
 						for (int i = 0; i < craftingTableBlockEntity.handler.getSlots(); ++i) {
 							MiscHelper.spawnItemStack(level, pos.getX(), pos.getY(), pos.getZ(), craftingTableBlockEntity.handler.getStackInSlot(i));
 						}
@@ -249,16 +240,6 @@ public class EnchantedChestBlock extends AbstractChestBlock<EnchantedChestBlockE
 			}
 
 			super.onRemove(state, level, pos, newState, isMoving);
-		}
-	}
-
-	@Override
-	public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		super.setPlacedBy(level, pos, state, placer, stack);
-		BlockEntity blockentity = level.getBlockEntity(pos);
-		if (blockentity instanceof EnchantedChestBlockEntity chestBlockEntity) {
-			chestBlockEntity.setCustomName(stack.getHoverName());
-			chestBlockEntity.setEnchantments(stack.getEnchantmentTags());
 		}
 	}
 }

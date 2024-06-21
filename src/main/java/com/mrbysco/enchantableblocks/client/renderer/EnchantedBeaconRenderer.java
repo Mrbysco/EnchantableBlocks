@@ -38,7 +38,7 @@ public class EnchantedBeaconRenderer extends BeaconRenderer {
 		if (renderEnchantment) {
 			poseStack.pushPose();
 			PoseStack.Pose pose = poseStack.last();
-			VertexConsumer consumer = new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose.pose(), pose.normal(), 0.0078125F);
+			VertexConsumer consumer = new SheetedDecalTextureGenerator(bufferSource.getBuffer(CustomRenderType.GLINT), pose, 0.0078125F);
 			blockRenderDispatcher.renderBatched(
 					blockEntity.getBlockState(),
 					blockEntity.getBlockPos(),

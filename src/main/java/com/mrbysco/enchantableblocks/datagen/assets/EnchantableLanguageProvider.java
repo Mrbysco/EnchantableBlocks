@@ -4,10 +4,10 @@ import com.mrbysco.enchantableblocks.EnchantableBlocks;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.neoforged.neoforge.common.data.LanguageProvider;
-
-import java.util.function.Supplier;
 
 public class EnchantableLanguageProvider extends LanguageProvider {
 	public EnchantableLanguageProvider(PackOutput packOutput) {
@@ -53,8 +53,8 @@ public class EnchantableLanguageProvider extends LanguageProvider {
 		addEnchantment(ModEnchantments.SPEED, "Speed");
 		addEnchantmentDescription(ModEnchantments.SPEED, "Increases the speed at which functions are performed");
 
-		addEnchantment(ModEnchantments.FUEL_EFFICIENCY, "Fuel Efficiency");
-		addEnchantmentDescription(ModEnchantments.FUEL_EFFICIENCY, "Increases the duration of fuels");
+		addEnchantment(ModEnchantments.BLOCK_EFFICIENCY, "Block Efficiency");
+		addEnchantmentDescription(ModEnchantments.BLOCK_EFFICIENCY, "Increases the efficiency of the block");
 
 		addEnchantment(ModEnchantments.YIELD, "Yield");
 		addEnchantmentDescription(ModEnchantments.YIELD, "Adds a chance of increased results");
@@ -89,10 +89,22 @@ public class EnchantableLanguageProvider extends LanguageProvider {
 		addEnchantment(ModEnchantments.STORING, "Storing");
 		addEnchantmentDescription(ModEnchantments.STORING, "Increases the storage capacity of the block");
 
+		addEnchantment(ModEnchantments.DAMAGE, "Damage");
+		addEnchantmentDescription(ModEnchantments.DAMAGE, "Increases the damage dealt by the block");
+
+		addEnchantment(ModEnchantments.BLOCK_PROTECTION, "Block Protection");
+		addEnchantmentDescription(ModEnchantments.BLOCK_PROTECTION, "Protects the block from external damage");
+
 		add("config.jade.plugin_enchantableblocks.enchantments", "Enchantments");
 	}
 
-	private void addEnchantmentDescription(Supplier<? extends Enchantment> key, String description) {
-		add(key.get().getDescriptionId() + ".desc", description);
+	private void addEnchantment(ResourceKey<Enchantment> key, String name) {
+		ResourceLocation location = key.location();
+		add("enchantment." + location.getNamespace() + "." + location.getPath(), name);
+	}
+
+	private void addEnchantmentDescription(ResourceKey<Enchantment> key, String description) {
+		ResourceLocation location = key.location();
+		add("enchantment." + location.getNamespace() + "." + location.getPath() + ".desc", description);
 	}
 }

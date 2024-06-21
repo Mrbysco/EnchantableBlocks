@@ -4,22 +4,22 @@ import com.mrbysco.enchantableblocks.EnchantableBlocks;
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedDispenserBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
+import com.mrbysco.enchantableblocks.util.EnchantmentUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Containers;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -54,9 +54,9 @@ public class EnchantedDispenserBlock extends DispenserBlock {
 				serverLevel.gameEvent(GameEvent.BLOCK_ACTIVATE, pos, GameEvent.Context.of(dispenserblockentity.getBlockState()));
 			} else {
 				ItemStack itemstack = dispenserblockentity.getItem(i);
-				DispenseItemBehavior dispenseitembehavior = this.getDispenseMethod(itemstack);
+				DispenseItemBehavior dispenseitembehavior = this.getDispenseMethod(serverLevel, itemstack);
 				if (dispenseitembehavior != DispenseItemBehavior.NOOP) {
-					if (dispenserblockentity.hasEnchantment(Enchantments.INFINITY_ARROWS) && itemstack.is(ItemTags.ARROWS)) {
+					if (dispenserblockentity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(serverLevel, Enchantments.INFINITY)) && itemstack.is(ItemTags.ARROWS)) {
 						dispenseitembehavior.dispense(blocksource, itemstack);
 					} else {
 						dispenserblockentity.setItem(i, dispenseitembehavior.dispense(blocksource, itemstack));
@@ -72,21 +72,13 @@ public class EnchantedDispenserBlock extends DispenserBlock {
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
-		ItemStack originalStack = new ItemStack(Blocks.DISPENSER);
-		if (level.getBlockEntity(pos) instanceof IEnchantable blockEntity && blockEntity.getEnchantmentsTag() != null) {
-			originalStack.getOrCreateTag().put("Enchantments", blockEntity.getEnchantmentsTag());
-		}
-		return originalStack;
-	}
-
-	@Override
 	public float getExplosionResistance(BlockState state, BlockGetter level, BlockPos pos, Explosion explosion) {
 		float explosionResistance = super.getExplosionResistance(state, level, pos, explosion);
 		BlockEntity blockentity = level.getBlockEntity(pos);
 		if (blockentity instanceof IEnchantable enchantable) {
-			if (enchantable.hasEnchantment(Enchantments.BLAST_PROTECTION)) {
-				int enchantmentLevel = enchantable.getEnchantmentLevel(Enchantments.BLAST_PROTECTION);
+			Holder<Enchantment> blastHolder = EnchantmentUtil.getEnchantmentHolder(blockentity, Enchantments.BLAST_PROTECTION);
+			if (enchantable.hasEnchantment(blastHolder)) {
+				int enchantmentLevel = enchantable.getEnchantmentLevel(blastHolder);
 				explosionResistance *= ((enchantmentLevel + 1) * 30);
 			}
 		}
@@ -98,7 +90,7 @@ public class EnchantedDispenserBlock extends DispenserBlock {
 		if (!state.is(newState.getBlock())) {
 			BlockEntity blockentity = level.getBlockEntity(pos);
 			if (blockentity instanceof EnchantedDispenserBlockEntity dispenserBlockEntity) {
-				if (!dispenserBlockEntity.hasEnchantment(Enchantments.VANISHING_CURSE)) {
+				if (!dispenserBlockEntity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(blockentity, Enchantments.VANISHING_CURSE))) {
 					Containers.dropContents(level, pos, dispenserBlockEntity);
 					level.updateNeighbourForOutputSignal(pos, this);
 				}
@@ -114,19 +106,12 @@ public class EnchantedDispenserBlock extends DispenserBlock {
 	public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
 		BlockEntity blockentity = params.getParameter(LootContextParams.BLOCK_ENTITY);
 		if (blockentity instanceof IEnchantable enchantable) {
-			if (enchantable.hasEnchantment(Enchantments.VANISHING_CURSE)) {
+			if (enchantable.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(blockentity, Enchantments.VANISHING_CURSE))) {
 				return List.of();
 			}
 		}
 		return super.getDrops(state, params);
 	}
 
-	@Override
-	public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		super.setPlacedBy(level, pos, state, placer, stack);
-		BlockEntity blockentity = level.getBlockEntity(pos);
-		if (blockentity instanceof IEnchantable enchantable) {
-			enchantable.setEnchantments(stack.getEnchantmentTags());
-		}
-	}
+
 }
