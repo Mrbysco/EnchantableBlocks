@@ -9,11 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModEnchantments {
-	public static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(Registries.ENCHANTMENT, EnchantableBlocks.MOD_ID);
-
 	public static final ResourceKey<Enchantment> DAMAGE = key("damage");
 	public static final ResourceKey<Enchantment> SPEED = key("speed");
 	public static final ResourceKey<Enchantment> BLOCK_EFFICIENCY = key("block_efficiency");

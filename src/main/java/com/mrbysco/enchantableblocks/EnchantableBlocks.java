@@ -29,7 +29,6 @@ public class EnchantableBlocks {
 	public EnchantableBlocks(IEventBus eventBus) {
 		ModRegistry.BLOCKS.register(eventBus);
 		ModRegistry.BLOCK_ENTITY_TYPES.register(eventBus);
-		ModEnchantments.ENCHANTMENTS.register(eventBus);
 		ModMenus.MENU_TYPES.register(eventBus);
 
 		eventBus.addListener(ModRegistry::registerCapabilities);
