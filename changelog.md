@@ -1,1 +1,1 @@
-* Register a Point of Interest Type for the Enchanted Beehive, so it can be added to the `bee_home` Point of interest type tags
+* Allow Enchantment Tables and Respawn Anchors to be enchanted with Block Efficiency again (Somewhere in the 1.21 port it was removed, but it was never intended to be removed.)
