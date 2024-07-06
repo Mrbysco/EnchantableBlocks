@@ -3,6 +3,8 @@
     "minecraft:furnace",
     "minecraft:blast_furnace",
     "minecraft:smoker",
-    "minecraft:hopper"
+    "minecraft:hopper",
+    "minecraft:enchanting_table",
+    "minecraft:respawn_anchor"
   ]
 }

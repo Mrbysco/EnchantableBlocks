@@ -26,7 +26,8 @@ public class EnchantableItemTagsProvider extends ItemTagsProvider {
 		this.tag(ModTags.Items.SPEED_ENCHANTABLE).add(Items.FURNACE, Items.BLAST_FURNACE, Items.SMOKER, Items.HOPPER,
 				Items.BEEHIVE);
 		this.tag(ModTags.Items.DAMAGE_ENCHANTABLE).add(Items.CONDUIT);
-		this.tag(ModTags.Items.BLOCK_EFFICIENCY_ENCHANTABLE).add(Items.FURNACE, Items.BLAST_FURNACE, Items.SMOKER, Items.HOPPER);
+		this.tag(ModTags.Items.BLOCK_EFFICIENCY_ENCHANTABLE).add(Items.FURNACE, Items.BLAST_FURNACE, Items.SMOKER, Items.HOPPER,
+				Items.ENCHANTING_TABLE, Items.RESPAWN_ANCHOR);
 		this.tag(ModTags.Items.YIELD_ENCHANTABLE).add(Items.FURNACE, Items.BLAST_FURNACE, Items.SMOKER);
 		this.tag(ModTags.Items.PRESERVATION_ENCHANTABLE).add(Items.FURNACE, Items.BLAST_FURNACE, Items.SMOKER,
 				Items.ENCHANTING_TABLE);

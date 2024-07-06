@@ -1,5 +1,5 @@
-// 1.21	2024-06-21T23:21:05.8917465	Tags for minecraft:item mod id enchantableblocks
-cfdb7f6be44a214c9e6716ac5ef6598bcb932c02 data/enchantableblocks/tags/item/block_efficiency_enchantable.json
+// 1.21	2024-07-06T19:40:03.193772	Tags for minecraft:item mod id enchantableblocks
+d84444618ea3fcacbf0dfe5d5a19dd67ac8baf9a data/enchantableblocks/tags/item/block_efficiency_enchantable.json
 dd9d3265becde20d4293309984371898e8e50841 data/enchantableblocks/tags/item/block_protection_enchantable.json
 1c3e69d597a0b62e7d44478453a9544a2110a902 data/enchantableblocks/tags/item/boiling_enchantable.json
 5b36a0e96588a9970ec8ed9918d7dbb02bb3eb6c data/enchantableblocks/tags/item/concealed_enchantable.json
