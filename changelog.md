@@ -1,1 +1,1 @@
-* Initial update to 1.21
+* Register a Point of Interest Type for the Enchanted Beehive, so it can be added to the `bee_home` Point of interest type tags
