@@ -6,6 +6,7 @@ import com.mrbysco.enchantableblocks.datagen.data.EnchantableBlockTagsProvider;
 import com.mrbysco.enchantableblocks.datagen.data.EnchantableEnchantmentTagsProvider;
 import com.mrbysco.enchantableblocks.datagen.data.EnchantableItemTagsProvider;
 import com.mrbysco.enchantableblocks.datagen.data.EnchantableLootProvider;
+import com.mrbysco.enchantableblocks.datagen.data.EnchantablePoiTypeTagsProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -31,6 +32,7 @@ public class EnchantableDatagen {
 			BlockTagsProvider blockTagProvider;
 			generator.addProvider(true, blockTagProvider = new EnchantableBlockTagsProvider(packOutput, lookupProvider, existingFileHelper));
 			generator.addProvider(true, new EnchantableItemTagsProvider(packOutput, lookupProvider, blockTagProvider.contentsGetter(), existingFileHelper));
+			generator.addProvider(true, new EnchantablePoiTypeTagsProvider(packOutput, lookupProvider, existingFileHelper));
 		}
 		if (event.includeClient()) {
 			generator.addProvider(true, new EnchantableLanguageProvider(packOutput));
