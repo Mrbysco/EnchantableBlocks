@@ -1,2 +1,1 @@
-* Fix Preservation on Crafing Tables
-* Fix Preservation enchant on furnaces
+* Register a Point of Interest Type for the Enchanted Beehive, so it can be added to the `bee_home` Point of interest type tags
