@@ -5,6 +5,7 @@ import com.mrbysco.enchantableblocks.client.ClientHandler;
 import com.mrbysco.enchantableblocks.compat.top.TOPCompat;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModMenus;
+import com.mrbysco.enchantableblocks.registry.ModPoiTypes;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import com.mrbysco.enchantableblocks.util.BlockReplacement;
 import com.mrbysco.enchantableblocks.util.ReplacementUtil;
@@ -30,6 +31,7 @@ public class EnchantableBlocks {
 		ModRegistry.BLOCKS.register(eventBus);
 		ModRegistry.BLOCK_ENTITY_TYPES.register(eventBus);
 		ModMenus.MENU_TYPES.register(eventBus);
+		ModPoiTypes.POI_TYPES.register(eventBus);
 
 		eventBus.addListener(ModRegistry::registerCapabilities);
 		eventBus.addListener(this::sendImc);

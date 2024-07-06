@@ -8,6 +8,7 @@ import com.mrbysco.enchantableblocks.datagen.data.EnchantableItemTagsProvider;
 import com.mrbysco.enchantableblocks.datagen.data.EnchantableLootProvider;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import net.minecraft.core.Cloner;
+import com.mrbysco.enchantableblocks.datagen.data.EnchantablePoiTypeTagsProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistrySetBuilder;
@@ -44,6 +45,7 @@ public class EnchantableDatagen {
 			BlockTagsProvider blockTagProvider;
 			generator.addProvider(true, blockTagProvider = new EnchantableBlockTagsProvider(packOutput, lookupProvider, existingFileHelper));
 			generator.addProvider(true, new EnchantableItemTagsProvider(packOutput, lookupProvider, blockTagProvider.contentsGetter(), existingFileHelper));
+			generator.addProvider(true, new EnchantablePoiTypeTagsProvider(packOutput, lookupProvider, existingFileHelper));
 		}
 		if (event.includeClient()) {
 			generator.addProvider(true, new EnchantableLanguageProvider(packOutput));
