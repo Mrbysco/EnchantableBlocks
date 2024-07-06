@@ -1,1 +1,1 @@
-* Register a Point of Interest Type for the Enchanted Beehive, so it can be added to the `bee_home` Point of interest type tags
+* Fix bee_home tag being incorrect due to an error in the code
