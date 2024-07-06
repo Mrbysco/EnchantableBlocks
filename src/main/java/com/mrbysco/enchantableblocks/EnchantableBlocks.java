@@ -3,7 +3,6 @@ package com.mrbysco.enchantableblocks;
 import com.mojang.logging.LogUtils;
 import com.mrbysco.enchantableblocks.client.ClientHandler;
 import com.mrbysco.enchantableblocks.compat.top.TOPCompat;
-import com.mrbysco.enchantableblocks.registry.ModEnchantments;
 import com.mrbysco.enchantableblocks.registry.ModMenus;
 import com.mrbysco.enchantableblocks.registry.ModPoiTypes;
 import com.mrbysco.enchantableblocks.registry.ModRegistry;
