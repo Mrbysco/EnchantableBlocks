@@ -1,1 +1,1 @@
-* Allow Enchantment Tables and Respawn Anchors to be enchanted with Block Efficiency again (Somewhere in the 1.21 port it was removed, but it was never intended to be removed.)
+* Add missing enchantment tags
