@@ -1,0 +1,4 @@
+// 1.21	2024-07-28T18:31:04.1815484	Tags for minecraft:enchantment mod id enchantableblocks
+58ef56ac5d4eaa29e062d060fba3e1ef4122656e data/minecraft/tags/enchantment/curse.json
+0dc365c33af95f36a73c5617bcc87f2e58fc37ef data/minecraft/tags/enchantment/non_treasure.json
+58ef56ac5d4eaa29e062d060fba3e1ef4122656e data/minecraft/tags/enchantment/treasure.json

@@ -4,6 +4,7 @@ import com.mrbysco.enchantableblocks.EnchantableBlocks;
 import com.mrbysco.enchantableblocks.datagen.assets.EnchantableBlockstateProvider;
 import com.mrbysco.enchantableblocks.datagen.assets.EnchantableLanguageProvider;
 import com.mrbysco.enchantableblocks.datagen.data.EnchantableBlockTagsProvider;
+import com.mrbysco.enchantableblocks.datagen.data.EnchantableEnchantmentTagsProvider;
 import com.mrbysco.enchantableblocks.datagen.data.EnchantableItemTagsProvider;
 import com.mrbysco.enchantableblocks.datagen.data.EnchantableLootProvider;
 import com.mrbysco.enchantableblocks.datagen.data.EnchantablePoiTypeTagsProvider;
@@ -46,6 +47,7 @@ public class EnchantableDatagen {
 			generator.addProvider(true, blockTagProvider = new EnchantableBlockTagsProvider(packOutput, lookupProvider, existingFileHelper));
 			generator.addProvider(true, new EnchantableItemTagsProvider(packOutput, lookupProvider, blockTagProvider.contentsGetter(), existingFileHelper));
 			generator.addProvider(true, new EnchantablePoiTypeTagsProvider(packOutput, lookupProvider, existingFileHelper));
+			generator.addProvider(true, new EnchantableEnchantmentTagsProvider(packOutput, lookupProvider, existingFileHelper));
 		}
 		if (event.includeClient()) {
 			generator.addProvider(true, new EnchantableLanguageProvider(packOutput));

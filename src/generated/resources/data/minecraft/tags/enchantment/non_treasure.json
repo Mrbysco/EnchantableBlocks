@@ -1,0 +1,18 @@
+{
+  "values": [
+    "enchantableblocks:damage",
+    "enchantableblocks:speed",
+    "enchantableblocks:block_efficiency",
+    "enchantableblocks:yield",
+    "enchantableblocks:preservation",
+    "enchantableblocks:solar_radiance",
+    "enchantableblocks:exporting",
+    "enchantableblocks:concealed",
+    "enchantableblocks:glintless",
+    "enchantableblocks:ranged",
+    "enchantableblocks:boiling",
+    "enchantableblocks:well_rested",
+    "enchantableblocks:storing",
+    "enchantableblocks:block_protection"
+  ]
+}
