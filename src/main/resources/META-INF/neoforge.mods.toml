@@ -17,7 +17,7 @@ Allows enchanting of some blocks to change how they function
 [[dependencies.enchantableblocks]]
 modId="minecraft"
 type="required"
-versionRange="[1.21,1.22)"
+versionRange="[1.21.1,1.22)"
 ordering="NONE"
 side="BOTH"
 [[dependencies.enchantableblocks]]

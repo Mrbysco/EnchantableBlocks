@@ -167,4 +167,9 @@ public class EnchantedDispenserBlockEntity extends DispenserBlockEntity implemen
 		this.saveAdditional(tag, this.level.registryAccess());
 		return tag;
 	}
+
+	@Override
+	public boolean isValidBlockState(BlockState state) {
+		return this.getType().isValid(state);
+	}
 }

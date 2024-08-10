@@ -339,4 +339,9 @@ public class EnchantedBeaconBlockEntity extends BeaconBlockEntity implements IEn
 		this.saveAdditional(tag, this.level.registryAccess());
 		return tag;
 	}
+
+	@Override
+	public boolean isValidBlockState(BlockState state) {
+		return this.getType().isValid(state);
+	}
 }

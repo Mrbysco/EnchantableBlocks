@@ -233,4 +233,9 @@ public class EnchantedBeehiveBlockEntity extends BeehiveBlockEntity implements I
 		return tag;
 	}
 
+	@Override
+	public boolean isValidBlockState(BlockState state) {
+		return this.getType().isValid(state);
+	}
+
 }

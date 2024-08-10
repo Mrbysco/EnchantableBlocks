@@ -167,4 +167,9 @@ public class EnchantedBedBlockEntity extends BedBlockEntity implements IEnchanta
 		this.saveAdditional(tag, this.level.registryAccess());
 		return tag;
 	}
+
+	@Override
+	public boolean isValidBlockState(BlockState state) {
+		return this.getType().isValid(state);
+	}
 }

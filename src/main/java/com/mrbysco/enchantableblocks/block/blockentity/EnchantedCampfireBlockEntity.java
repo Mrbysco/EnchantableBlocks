@@ -255,4 +255,9 @@ public class EnchantedCampfireBlockEntity extends CampfireBlockEntity implements
 		this.saveAdditional(tag, this.level.registryAccess());
 		return tag;
 	}
+
+	@Override
+	public boolean isValidBlockState(BlockState state) {
+		return this.getType().isValid(state);
+	}
 }

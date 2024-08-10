@@ -328,4 +328,9 @@ public class EnchantedConduitBlockEntity extends ConduitBlockEntity implements I
 		this.saveAdditional(tag, this.level.registryAccess());
 		return tag;
 	}
+
+	@Override
+	public boolean isValidBlockState(BlockState state) {
+		return this.getType().isValid(state);
+	}
 }
