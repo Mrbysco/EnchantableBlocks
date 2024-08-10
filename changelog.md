@@ -1,1 +1,1 @@
-* Add missing enchantment tags
+* Fix crash when placing certain enchanted blocks in 1.21.1
