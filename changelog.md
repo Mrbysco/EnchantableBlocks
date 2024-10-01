@@ -1,1 +1,1 @@
-* Fix crash when placing certain enchanted blocks in 1.21.1
+* Fix an issue where enchantments got lost upon reloading the world
