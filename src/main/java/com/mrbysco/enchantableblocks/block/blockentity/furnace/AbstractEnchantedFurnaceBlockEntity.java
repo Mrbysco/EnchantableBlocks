@@ -1,7 +1,5 @@
 package com.mrbysco.enchantableblocks.block.blockentity.furnace;
 
-import com.mojang.serialization.Dynamic;
-import com.mrbysco.enchantableblocks.EnchantableBlocks;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.mixin.AbstractFurnaceBlockEntityAccessor;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
@@ -18,7 +16,6 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.tags.TagKey;
@@ -42,6 +39,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnaceBlockEntity implements IEnchantable {
@@ -62,9 +60,6 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		boolean solar = blockEntity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.SOLAR_RADIANCE));
 		boolean solarRequirements = level.isDay() && level.canSeeSky(pos.above());
 
-		if (hasInput) {
-			EnchantableBlocks.LOGGER.info("{}", blockEntity.items.getFirst().getComponents().keySet());
-		}
 		if (blockEntity.isLit()) {
 			int speed = blockEntity.getSpeed();
 			if (solar) {
@@ -97,7 +92,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 					blockEntity.litTime = 200;
 					blockEntity.litDuration = blockEntity.litTime;
 				} else if (canBurn(level.registryAccess(), recipe, blockEntity.items, i, blockEntity)) {
-					blockEntity.litTime = blockEntity.getBurnDuration(fuel);
+					blockEntity.litTime = blockEntity.getBurnDuration(fuel, level);
 					blockEntity.litDuration = blockEntity.litTime;
 					if (blockEntity.isLit()) {
 						changed = true;
@@ -142,7 +137,8 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		}
 	}
 
-	private static boolean canBurn(RegistryAccess pRegistryAccess, @javax.annotation.Nullable RecipeHolder<?> pRecipe, NonNullList<ItemStack> pInventory, int pMaxStackSize, AbstractEnchantedFurnaceBlockEntity furnace) {
+	@SuppressWarnings("unchecked")
+	private static boolean canBurn(RegistryAccess pRegistryAccess, @Nullable RecipeHolder<?> pRecipe, NonNullList<ItemStack> pInventory, int pMaxStackSize, AbstractEnchantedFurnaceBlockEntity furnace) {
 		if (!pInventory.get(0).isEmpty() && pRecipe != null) {
 			ItemStack itemstack = ((RecipeHolder<? extends AbstractCookingRecipe>) pRecipe).value().assemble(new SingleRecipeInput(furnace.getItem(0)), pRegistryAccess);
 			if (itemstack.isEmpty()) {
@@ -241,12 +237,11 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		return cookTime;
 	}
 
-	@Override
-	protected int getBurnDuration(ItemStack fuel) {
+	protected int getBurnDuration(ItemStack fuel, @NotNull Level level) {
 		int burnDuration = super.getBurnDuration(fuel);
-		Holder<Enchantment> FuelEfficiencyHolder = EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.BLOCK_EFFICIENCY);
-		if (burnDuration != 0 && this.hasEnchantment(FuelEfficiencyHolder)) {
-			int enchantmentLevel = this.getEnchantmentLevel(FuelEfficiencyHolder);
+		Holder<Enchantment> fuelEfficiencyHolder = EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.BLOCK_EFFICIENCY);
+		if (burnDuration != 0 && this.hasEnchantment(fuelEfficiencyHolder)) {
+			int enchantmentLevel = this.getEnchantmentLevel(fuelEfficiencyHolder);
 			//Adjust the burnDuration based on the level of the enchantment
 			burnDuration = Mth.ceil(burnDuration * (1F + (enchantmentLevel * 0.2F)));
 		}
@@ -306,18 +301,13 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 	@Override
 	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
 		super.loadAdditional(tag, registries);
-		if (tag.contains("Enchantments")) {
-			ItemEnchantments.CODEC.parse(new Dynamic<>(NbtOps.INSTANCE, tag.get("Enchantments"))).resultOrPartial().ifPresent(enchantments -> this.enchantments = enchantments);
-			this.enchantments = ItemEnchantments.CODEC.parse(NbtOps.INSTANCE, tag.get("Enchantments")).result().orElse(null);
-		}
+		this.loadEnchantments(tag, registries);
 	}
 
 	@Override
 	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
 		super.saveAdditional(tag, registries);
-		if (this.enchantments != null) {
-			ItemEnchantments.CODEC.encodeStart(NbtOps.INSTANCE, this.enchantments).resultOrPartial().ifPresent(enchantments -> tag.put("Enchantments", enchantments));
-		}
+		this.saveEnchantments(tag, registries);
 	}
 
 	@Override

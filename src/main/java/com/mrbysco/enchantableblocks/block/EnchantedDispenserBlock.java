@@ -43,23 +43,23 @@ public class EnchantedDispenserBlock extends DispenserBlock {
 
 	@Override
 	protected void dispenseFrom(ServerLevel serverLevel, BlockState state, BlockPos pos) {
-		EnchantedDispenserBlockEntity dispenserblockentity = serverLevel.getBlockEntity(pos, ModRegistry.ENCHANTED_DISPENSER_BLOCK_ENTITY.get()).orElse(null);
-		if (dispenserblockentity == null) {
+		EnchantedDispenserBlockEntity dispenserBlockEntity = serverLevel.getBlockEntity(pos, ModRegistry.ENCHANTED_DISPENSER_BLOCK_ENTITY.get()).orElse(null);
+		if (dispenserBlockEntity == null) {
 			EnchantableBlocks.LOGGER.warn("Ignoring dispensing attempt for Enchanted Dispenser without matching block entity at {}", pos);
 		} else {
-			BlockSource blocksource = new BlockSource(serverLevel, pos, state, dispenserblockentity);
-			int i = dispenserblockentity.getRandomSlot(serverLevel.random);
+			BlockSource blocksource = new BlockSource(serverLevel, pos, state, dispenserBlockEntity);
+			int i = dispenserBlockEntity.getRandomSlot(serverLevel.random);
 			if (i < 0) {
 				serverLevel.levelEvent(1001, pos, 0);
-				serverLevel.gameEvent(GameEvent.BLOCK_ACTIVATE, pos, GameEvent.Context.of(dispenserblockentity.getBlockState()));
+				serverLevel.gameEvent(GameEvent.BLOCK_ACTIVATE, pos, GameEvent.Context.of(dispenserBlockEntity.getBlockState()));
 			} else {
-				ItemStack itemstack = dispenserblockentity.getItem(i);
+				ItemStack itemstack = dispenserBlockEntity.getItem(i);
 				DispenseItemBehavior dispenseitembehavior = this.getDispenseMethod(serverLevel, itemstack);
 				if (dispenseitembehavior != DispenseItemBehavior.NOOP) {
-					if (dispenserblockentity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(serverLevel, Enchantments.INFINITY)) && itemstack.is(ItemTags.ARROWS)) {
+					if (dispenserBlockEntity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(serverLevel, Enchantments.INFINITY)) && itemstack.is(ItemTags.ARROWS)) {
 						dispenseitembehavior.dispense(blocksource, itemstack);
 					} else {
-						dispenserblockentity.setItem(i, dispenseitembehavior.dispense(blocksource, itemstack));
+						dispenserBlockEntity.setItem(i, dispenseitembehavior.dispense(blocksource, itemstack));
 					}
 				}
 			}

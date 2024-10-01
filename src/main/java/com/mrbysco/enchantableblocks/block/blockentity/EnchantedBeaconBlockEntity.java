@@ -1,7 +1,6 @@
 package com.mrbysco.enchantableblocks.block.blockentity;
 
 import com.google.common.collect.Lists;
-import com.mojang.serialization.Dynamic;
 import com.mrbysco.enchantableblocks.menu.EnchantedBeaconMenu;
 import com.mrbysco.enchantableblocks.mixin.BeaconBeamSectionAccessor;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
@@ -16,7 +15,6 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -256,24 +254,13 @@ public class EnchantedBeaconBlockEntity extends BeaconBlockEntity implements IEn
 	@Override
 	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
 		super.loadAdditional(tag, registries);
-		if (tag.contains("Enchantments")) {
-			ItemEnchantments.CODEC
-					.parse(new Dynamic<>(NbtOps.INSTANCE, tag.get("Enchantments")))
-					.resultOrPartial()
-					.ifPresent(enchantments -> this.enchantments = enchantments);
-			this.enchantments = ItemEnchantments.CODEC.parse(NbtOps.INSTANCE, tag.get("Enchantments")).result().orElse(null);
-		}
+		this.loadEnchantments(tag, registries);
 	}
 
 	@Override
 	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
 		super.saveAdditional(tag, registries);
-		if (this.enchantments != null) {
-			ItemEnchantments.CODEC
-					.encodeStart(NbtOps.INSTANCE, this.enchantments)
-					.resultOrPartial()
-					.ifPresent(enchantments -> tag.put("Enchantments", enchantments));
-		}
+		this.saveEnchantments(tag, registries);
 	}
 
 	@Override

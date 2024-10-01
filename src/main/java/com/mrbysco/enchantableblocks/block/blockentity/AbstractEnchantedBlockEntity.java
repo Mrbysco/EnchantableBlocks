@@ -1,6 +1,5 @@
 package com.mrbysco.enchantableblocks.block.blockentity;
 
-import com.mojang.serialization.Dynamic;
 import com.mrbysco.enchantableblocks.util.TagHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -8,7 +7,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.tags.TagKey;
@@ -76,24 +74,13 @@ public abstract class AbstractEnchantedBlockEntity extends BlockEntity implement
 	@Override
 	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
 		super.loadAdditional(tag, registries);
-		if (tag.contains("Enchantments")) {
-			ItemEnchantments.CODEC
-					.parse(new Dynamic<>(NbtOps.INSTANCE, tag.get("Enchantments")))
-					.resultOrPartial()
-					.ifPresent(enchantments -> this.enchantments = enchantments);
-			this.enchantments = ItemEnchantments.CODEC.parse(NbtOps.INSTANCE, tag.get("Enchantments")).result().orElse(null);
-		}
+		this.loadEnchantments(tag, registries);
 	}
 
 	@Override
 	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
 		super.saveAdditional(tag, registries);
-		if (this.enchantments != null) {
-			ItemEnchantments.CODEC
-					.encodeStart(NbtOps.INSTANCE, this.enchantments)
-					.resultOrPartial()
-					.ifPresent(enchantments -> tag.put("Enchantments", enchantments));
-		}
+		this.saveEnchantments(tag, registries);
 	}
 
 	@Override
@@ -114,7 +101,6 @@ public abstract class AbstractEnchantedBlockEntity extends BlockEntity implement
 	@Override
 	public void removeComponentsFromTag(CompoundTag tag) {
 		super.removeComponentsFromTag(tag);
-
 	}
 
 	//Sync stuff
