@@ -58,7 +58,8 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 		boolean changed = false;
 		boolean hasInput = !blockEntity.items.getFirst().isEmpty();
 		boolean solar = blockEntity.hasEnchantment(EnchantmentUtil.getEnchantmentHolder(level, ModEnchantments.SOLAR_RADIANCE));
-		boolean solarRequirements = level.isDay() && level.canSeeSky(pos.above());
+		// If dimension has a fixed time (Level#isDay() always returns false there), check against the sky darkness directly (same as Level#isDay's impl)
+		boolean solarRequirements = (level.isDay() || (level.dimensionType().hasFixedTime() && level.getSkyDarken() < 4)) && level.canSeeSky(pos.above());
 
 		if (blockEntity.isLit()) {
 			int speed = blockEntity.getSpeed();
