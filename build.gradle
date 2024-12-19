@@ -93,9 +93,9 @@ dependencies {
 
     localRuntime "mezz.jei:jei-${jei_minecraft}-neoforge:${jei_version}"
 
-    compileOnly "curse.maven:jade-324717:5729884"
-    localRuntime "curse.maven:jade-324717:5729884"
-    compileOnly "curse.maven:the-one-probe-245211:5502323"
+    compileOnly "curse.maven:jade-324717:5992846"
+    localRuntime "curse.maven:jade-324717:5992846"
+    compileOnly "curse.maven:the-one-probe-245211:5836106"
 
 //    runtimeOnly "curse.maven:bookshelf-228525:5251135"
 //    runtimeOnly "curse.maven:enchantment-descriptions-250419:5264037"
