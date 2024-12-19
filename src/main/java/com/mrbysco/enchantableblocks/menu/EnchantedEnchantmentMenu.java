@@ -3,6 +3,7 @@ package com.mrbysco.enchantableblocks.menu;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.mixin.EnchantmentMenuAccessor;
 import com.mrbysco.enchantableblocks.registry.ModMenus;
+import com.mrbysco.enchantableblocks.registry.ModRegistry;
 import com.mrbysco.enchantableblocks.util.EnchantmentUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -10,6 +11,7 @@ import net.minecraft.core.IdMap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -92,5 +94,10 @@ public class EnchantedEnchantmentMenu extends EnchantmentMenu {
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean stillValid(Player player) {
+		return stillValid(this.access, player, ModRegistry.ENCHANTED_ENCHANTING_TABLE.get());
 	}
 }
