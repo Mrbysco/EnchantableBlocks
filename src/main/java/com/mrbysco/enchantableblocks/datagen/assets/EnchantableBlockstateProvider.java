@@ -39,6 +39,7 @@ public class EnchantableBlockstateProvider extends BlockStateProvider {
 		simpleBlock(ModRegistry.ENCHANTED_CHEST.get(), models().getExistingFile(mcLoc("chest")));
 		simpleBlock(ModRegistry.ENCHANTED_TRAPPED_CHEST.get(), models().getExistingFile(mcLoc("chest")));
 		beehive(ModRegistry.ENCHANTED_BEEHIVE);
+		enchantingTable(ModRegistry.ENCHANTED_ENCHANTING_TABLE);
 
 		simpleCutoutEnchantedBlock(ModRegistry.ENCHANTED_BEACON, "beacon");
 		simpleCutoutEnchantedBlock(ModRegistry.ENCHANTED_WHITE_BED, "bed");
@@ -165,6 +166,11 @@ public class EnchantableBlockstateProvider extends BlockStateProvider {
 				.modelForState().modelFile(charge3).addModel()
 				.partialState().with(RespawnAnchorBlock.CHARGE, 4)
 				.modelForState().modelFile(charge4).addModel();
+	}
+
+	private void enchantingTable(DeferredBlock<? extends Block> block) {
+		ModelFile model = models().getExistingFile(mcLoc("enchanting_table"));
+		getVariantBuilder(block.get()).partialState().modelForState().modelFile(model).addModel();
 	}
 
 	private ResourceLocation suffix(ResourceLocation location, String suffix) {

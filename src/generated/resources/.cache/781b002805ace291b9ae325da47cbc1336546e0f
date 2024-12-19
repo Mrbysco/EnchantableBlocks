@@ -1,4 +1,4 @@
-// 1.21.1	2024-10-01T19:13:14.156473	Block States: enchantableblocks
+// 1.21.1	2024-12-19T21:34:00.3080566	Block States: enchantableblocks
 7b2d4e70edd0a72448e88b7eadc0a4884845109e assets/enchantableblocks/blockstates/enchanted_beacon.json
 f26f24ff24a6045b991d2ec4b04cec309c45cea9 assets/enchantableblocks/blockstates/enchanted_beehive.json
 eb55221f9ce73f02ff53f86c3cfe33a5208b3846 assets/enchantableblocks/blockstates/enchanted_black_bed.json
@@ -11,6 +11,7 @@ d581411fed47d175c55ca863a4b66ade769c3081 assets/enchantableblocks/blockstates/en
 73d337b16e2c9e9f6da8c89b9b04a7922dee3a7e assets/enchantableblocks/blockstates/enchanted_crafting_table.json
 0957af45993007954b29231b5126529638eb0418 assets/enchantableblocks/blockstates/enchanted_cyan_bed.json
 946ded70545b0b54d25a978c920e55ac8c7e07a8 assets/enchantableblocks/blockstates/enchanted_dispenser.json
+b825aff79fdf08fe701998ba56536cf1f106603a assets/enchantableblocks/blockstates/enchanted_enchanting_table.json
 c66c2ac72611834c17d466d53772f4b0d0831694 assets/enchantableblocks/blockstates/enchanted_furnace.json
 64fa986417a87269583f3d89c577e6ee057eecd4 assets/enchantableblocks/blockstates/enchanted_gray_bed.json
 53f7814dd60a7996d97ef777504b76541d01501f assets/enchantableblocks/blockstates/enchanted_green_bed.json
