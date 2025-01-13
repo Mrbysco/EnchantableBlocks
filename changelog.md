@@ -1,1 +1,1 @@
-* Fix Crafting Tables with Preservation not functioning
+* Fix Crafting Tables with Preservation not functioning 
