@@ -1,11 +1,16 @@
 package com.mrbysco.enchantableblocks.menu.crafting;
 
+import com.mrbysco.enchantableblocks.EnchantableBlocks;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 public class EnchantedCraftingContainer extends TransientCraftingContainer {
@@ -15,6 +20,15 @@ public class EnchantedCraftingContainer extends TransientCraftingContainer {
 	public EnchantedCraftingContainer(AbstractContainerMenu menu, ItemStackHandler itemHandler) {
 		super(menu, 3, 3);
 		this.inventory = itemHandler;
+	}
+
+	@Override
+	public List<ItemStack> getItems() {
+		NonNullList<ItemStack> stacks = NonNullList.withSize(inventory.getSlots(), ItemStack.EMPTY);
+		for (int i = 0; i < inventory.getSlots(); i++) {
+			stacks.set(i, inventory.getStackInSlot(i));
+		}
+		return List.copyOf(stacks);
 	}
 
 	@Override
@@ -69,10 +83,6 @@ public class EnchantedCraftingContainer extends TransientCraftingContainer {
 			return;
 		}
 		throw new IndexOutOfBoundsException("Someone attempted to an out of bound stack at slot " + slot);
-	}
-
-	public void pauseUpdates(boolean value) {
-		this.pauseUpdates = value;
 	}
 
 	public void onCraftMatrixChanged() {

@@ -29,7 +29,7 @@ public class EnchantableItemTagsProvider extends ItemTagsProvider {
 		this.tag(ModTags.Items.BLOCK_EFFICIENCY_ENCHANTABLE).add(Items.FURNACE, Items.BLAST_FURNACE, Items.SMOKER, Items.HOPPER,
 				Items.ENCHANTING_TABLE, Items.RESPAWN_ANCHOR);
 		this.tag(ModTags.Items.YIELD_ENCHANTABLE).add(Items.FURNACE, Items.BLAST_FURNACE, Items.SMOKER);
-		this.tag(ModTags.Items.PRESERVATION_ENCHANTABLE).add(Items.FURNACE, Items.BLAST_FURNACE, Items.SMOKER,
+		this.tag(ModTags.Items.PRESERVATION_ENCHANTABLE).add(Items.CRAFTING_TABLE, Items.FURNACE, Items.BLAST_FURNACE, Items.SMOKER,
 				Items.ENCHANTING_TABLE);
 		this.tag(ModTags.Items.SOLAR_RADIANCE_ENCHANTABLE).add(Items.FURNACE, Items.BLAST_FURNACE, Items.SMOKER);
 		this.tag(ModTags.Items.EXPORTING_ENCHANTABLE).add(Items.FURNACE, Items.BLAST_FURNACE, Items.SMOKER);

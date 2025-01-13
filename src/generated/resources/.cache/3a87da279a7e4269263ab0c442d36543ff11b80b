@@ -1,4 +1,4 @@
-// 1.21.1	2024-10-01T19:13:14.1519715	Tags for minecraft:item mod id enchantableblocks
+// 1.21.1	2025-01-13T20:44:49.0024487	Tags for minecraft:item mod id enchantableblocks
 d84444618ea3fcacbf0dfe5d5a19dd67ac8baf9a data/enchantableblocks/tags/item/block_efficiency_enchantable.json
 dd9d3265becde20d4293309984371898e8e50841 data/enchantableblocks/tags/item/block_protection_enchantable.json
 1c3e69d597a0b62e7d44478453a9544a2110a902 data/enchantableblocks/tags/item/boiling_enchantable.json
@@ -7,7 +7,7 @@ dd9d3265becde20d4293309984371898e8e50841 data/enchantableblocks/tags/item/block_
 406ec23abc48d2750d26097b5d352fc1552a7d14 data/enchantableblocks/tags/item/exporting_enchantable.json
 acd97c6ffb3a54c69e30e4b350bf6c95faeb29b2 data/enchantableblocks/tags/item/glintless_enchantable.json
 d2f84ff9a56427a4488abebb520c6a9d75838394 data/enchantableblocks/tags/item/intentional_game_design_enchantable.json
-8871f91e549c6963ed7bef7c61fb22937581560a data/enchantableblocks/tags/item/preservation_enchantable.json
+2e31fca4187a32d9c9419426161e3f4b07f33589 data/enchantableblocks/tags/item/preservation_enchantable.json
 ebcf3c0bf71d0d838b76910ac7a8bc015c001835 data/enchantableblocks/tags/item/ranged_enchantable.json
 406ec23abc48d2750d26097b5d352fc1552a7d14 data/enchantableblocks/tags/item/solar_radiance_enchantable.json
 257c0074a614ad6e31cc535bd50294df73306549 data/enchantableblocks/tags/item/speed_enchantable.json
