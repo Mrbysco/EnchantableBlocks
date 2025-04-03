@@ -1,6 +1,7 @@
 package com.mrbysco.enchantableblocks.block;
 
 import com.mojang.serialization.MapCodec;
+import com.mrbysco.enchantableblocks.EnchantableBlocks;
 import com.mrbysco.enchantableblocks.block.blockentity.EnchantedChestBlockEntity;
 import com.mrbysco.enchantableblocks.block.blockentity.IEnchantable;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;

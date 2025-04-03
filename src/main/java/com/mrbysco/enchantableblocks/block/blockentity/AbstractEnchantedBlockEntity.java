@@ -1,5 +1,6 @@
 package com.mrbysco.enchantableblocks.block.blockentity;
 
+import com.mrbysco.enchantableblocks.EnchantableBlocks;
 import com.mrbysco.enchantableblocks.util.TagHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;

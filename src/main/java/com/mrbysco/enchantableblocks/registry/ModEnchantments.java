@@ -1,6 +1,7 @@
 package com.mrbysco.enchantableblocks.registry;
 
 import com.mrbysco.enchantableblocks.EnchantableBlocks;
+import com.mrbysco.enchantableblocks.registry.ModTags.Items;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -247,7 +248,7 @@ public class ModEnchantments {
 				STORING,
 				Enchantment.enchantment(
 						Enchantment.definition(
-								itemHolderGetter.getOrThrow(ModTags.Items.WELL_RESTED_ENCHANTABLE),
+								itemHolderGetter.getOrThrow(Items.STORING_ENCHANTABLE),
 								10,
 								5,
 								Enchantment.dynamicCost(1, 10),

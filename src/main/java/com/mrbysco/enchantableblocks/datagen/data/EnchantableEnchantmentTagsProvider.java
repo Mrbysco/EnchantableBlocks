@@ -2,6 +2,8 @@ package com.mrbysco.enchantableblocks.datagen.data;
 
 import com.mrbysco.enchantableblocks.EnchantableBlocks;
 import com.mrbysco.enchantableblocks.registry.ModEnchantments;
+import com.mrbysco.enchantableblocks.registry.ModTags;
+import com.mrbysco.enchantableblocks.registry.ModTags.General;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EnchantmentTagsProvider;
@@ -33,5 +35,8 @@ public class EnchantableEnchantmentTagsProvider extends EnchantmentTagsProvider 
 				ModEnchantments.BOILING, ModEnchantments.WELL_RESTED,
 				ModEnchantments.STORING, ModEnchantments.BLOCK_PROTECTION
 		);
+
+		this.tag(General.STORAGE_UPGRADE)
+				.add(ModEnchantments.STORING);
 	}
 }

@@ -1,4 +1,5 @@
-// 1.21.1	2024-10-01T19:13:14.1554728	Tags for minecraft:enchantment mod id enchantableblocks
+// 1.21.1	2025-04-03T20:29:31.8176182	Tags for minecraft:enchantment mod id enchantableblocks
+4494c90fd0a20d5c77101616d565b98097d54d6c data/enchantableblocks/tags/enchantment/storage_upgrade.json
 58ef56ac5d4eaa29e062d060fba3e1ef4122656e data/minecraft/tags/enchantment/curse.json
 0dc365c33af95f36a73c5617bcc87f2e58fc37ef data/minecraft/tags/enchantment/non_treasure.json
 58ef56ac5d4eaa29e062d060fba3e1ef4122656e data/minecraft/tags/enchantment/treasure.json

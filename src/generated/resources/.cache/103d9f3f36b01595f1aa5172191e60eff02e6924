@@ -1,4 +1,4 @@
-// 1.21.1	2024-10-01T19:13:14.1544726	Registries
+// 1.21.1	2025-04-03T20:19:45.6745238	Registries
 6d4c10f21a925a061b6fa1a47e4e87abc5d5d775 data/enchantableblocks/enchantment/block_efficiency.json
 1f12d0890f673711d3fa2a73ef94b790a8320103 data/enchantableblocks/enchantment/block_protection.json
 733fe87bdde066eb7c5b6615a42ea88271303f7c data/enchantableblocks/enchantment/boiling.json
@@ -11,6 +11,6 @@ e05b7cab39545ccd47bcc36e23ca6c641cbfb922 data/enchantableblocks/enchantment/conc
 2702f860f7bec5e882e462041c909138416af901 data/enchantableblocks/enchantment/ranged.json
 5a9f96f86849b209b32105f6d4f572415dbd9de3 data/enchantableblocks/enchantment/solar_radiance.json
 1cf610c41ddf1d72d9596ec5f197327321dc0373 data/enchantableblocks/enchantment/speed.json
-cdea4e98bee465634a8c1ca1b65d31d5bc686ad3 data/enchantableblocks/enchantment/storing.json
+9b221227358a818eb3fa61452201ba0dc0a12069 data/enchantableblocks/enchantment/storing.json
 73120993e7fd0364a3ff1eef606cf3300ac8851c data/enchantableblocks/enchantment/well_rested.json
 1a58074e66879a62fbfb77907cd9fb3bbe15a4a9 data/enchantableblocks/enchantment/yield.json
