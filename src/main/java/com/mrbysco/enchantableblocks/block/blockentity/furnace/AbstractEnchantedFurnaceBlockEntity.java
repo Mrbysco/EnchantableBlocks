@@ -171,7 +171,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 					if (blockEntity != null) {
 						IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getCounterClockWise()).orElse(null);
 						if (itemHandler != null) {
-							resultStack = ItemHandlerHelper.insertItem(itemHandler, craftedStack, false);
+							craftedStack = ItemHandlerHelper.insertItem(itemHandler, craftedStack, false);
 						}
 					}
 				}
@@ -180,7 +180,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 					if (blockEntity != null) {
 						IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getClockWise()).orElse(null);
 						if (itemHandler != null) {
-							resultStack = ItemHandlerHelper.insertItem(itemHandler, craftedStack, false);
+							craftedStack = ItemHandlerHelper.insertItem(itemHandler, craftedStack, false);
 						}
 					}
 				}
