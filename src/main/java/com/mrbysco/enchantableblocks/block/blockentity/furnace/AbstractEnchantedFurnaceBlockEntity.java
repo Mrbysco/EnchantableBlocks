@@ -189,7 +189,7 @@ public abstract class AbstractEnchantedFurnaceBlockEntity extends AbstractFurnac
 			if (resultStack.isEmpty()) {
 				inventory.set(2, craftedStack.copy());
 			} else if (resultStack.is(craftedStack.getItem())) {
-				resultStack.grow(craftedStack.getCount());
+				resultStack.setCount(Mth.clamp(resultStack.getCount() + craftedStack.getCount(), 1, resultStack.getMaxStackSize()));
 			}
 
 			if (inputStack.is(Blocks.WET_SPONGE.asItem()) && !inventory.get(1).isEmpty() && inventory.get(1).is(Items.BUCKET)) {
