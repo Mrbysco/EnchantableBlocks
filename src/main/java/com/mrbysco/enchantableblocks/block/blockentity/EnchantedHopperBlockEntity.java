@@ -259,6 +259,8 @@ public class EnchantedHopperBlockEntity extends HopperBlockEntity implements IEn
 						if (remainder.isEmpty()) {
 							return true;
 						}
+						int extractedAmount = insertStack.getCount() - remainder.getCount();
+						originalSlotContents.shrink(extractedAmount);
 
 						sourceContainer.setItem(i, originalSlotContents);
 					}
