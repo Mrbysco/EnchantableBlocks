@@ -1,1 +1,1 @@
-* Fix Storing enchantment not applying
+* Fix Yield allowing the result stack to go over the stack size limit
